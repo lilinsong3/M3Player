@@ -31,7 +31,7 @@
             android:contentDescription="@string/play_control"
             android:padding="0dp"
             app:icon="@drawable/ic_play"
-            app:iconSize="@dimen/medium_size"
+            app:iconSize="@dimen/small_size"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/main_btn_next"
             app:layout_constraintTop_toTopOf="parent" />
@@ -44,7 +44,7 @@
             android:contentDescription="@string/next_song"
             android:padding="0dp"
             app:icon="@drawable/ic_next"
-            app:iconSize="@dimen/medium_size"
+            app:iconSize="@dimen/small_size"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
