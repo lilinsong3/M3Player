@@ -49,21 +49,21 @@
         android:id="@+id/play_text_song"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="歌曲名称"
         app:layout_constraintBottom_toTopOf="@+id/play_text_singer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/play_song_pic" />
+        app:layout_constraintTop_toBottomOf="@+id/play_song_pic"
+        tools:text="歌曲名称" />
 
     <TextView
         android:id="@+id/play_text_singer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="歌手"
         app:layout_constraintBottom_toTopOf="@+id/play_slider_progress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/play_text_song" />
+        app:layout_constraintTop_toBottomOf="@+id/play_text_song"
+        tools:text="歌手" />
 
     <androidx.constraintlayout.utils.widget.ImageFilterView
         android:id="@+id/play_song_pic"
@@ -81,6 +81,17 @@
         app:roundPercent="1"
         tools:background="?attr/colorPrimary" />
 
+    <androidx.media3.ui.PlayerView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:surface_type="none"
+        app:shutter_background_color="?attr/colorPrimary"
+        app:show_buffering="when_playing"
+        app:show_shuffle_button="true" />
+
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/play_toolbar"
         android:layout_width="0dp"
@@ -91,7 +102,7 @@
 
     <com.google.android.material.slider.Slider
         android:id="@+id/play_slider_progress"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/margin_small"
         android:contentDescription="@string/play_progress"
