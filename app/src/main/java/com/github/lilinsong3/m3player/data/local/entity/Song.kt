@@ -1,5 +1,6 @@
 package com.github.lilinsong3.m3player.data.local.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.PrimaryKey
 
 data class Song(
@@ -26,4 +27,6 @@ data class Song(
     val totalDiscCount: Int?,
     val genre: String?,
     val compilation: String?,
+    val duration: String = "?",
+    @ColumnInfo(defaultValue = "(datetime('now'))") val datetime: String
 )

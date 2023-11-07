@@ -98,5 +98,12 @@ class AudioLibraryService: MediaLibraryService() {
         ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
             return super.onGetSearchResult(session, browser, query, page, pageSize, params)
         }
+
+        override fun onPlaybackResumption(
+            mediaSession: MediaSession,
+            controller: MediaSession.ControllerInfo
+        ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
+            return super.onPlaybackResumption(mediaSession, controller)
+        }
     }
 }
