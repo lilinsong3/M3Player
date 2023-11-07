@@ -1,10 +1,13 @@
 package com.github.lilinsong3.m3player.data.local.entity
 
-import androidx.room.ColumnInfo
-import androidx.room.PrimaryKey
+import androidx.room.*
 
+@Fts4(tokenizer = FtsOptions.TOKENIZER_ICU, tokenizerArgs = ["zh_CN"])
+@Entity
 data class Song(
-    @PrimaryKey(autoGenerate = true) val id: Long,
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "rowid")
+    val id: Int,
     val title: String = "Unknown",
     val artist: String = "Unknown",
     val albumTitle: String = title,
@@ -28,5 +31,6 @@ data class Song(
     val genre: String?,
     val compilation: String?,
     val duration: String = "?",
-    @ColumnInfo(defaultValue = "(datetime('now'))") val datetime: String
+    @ColumnInfo(defaultValue = "(datetime('now'))")
+    val datetime: String
 )
