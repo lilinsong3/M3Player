@@ -1,12 +1,14 @@
 package com.github.lilinsong3.m3player.ui.play
 
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import com.github.lilinsong3.m3player.data.repository.PlayListRepository
 import com.google.common.collect.ImmutableList
+import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -42,16 +44,21 @@ class AudioLibraryService(val playListRepo: PlayListRepository) : MediaLibrarySe
 
     // TODO: Impl this
      inner class AudioLibrarySessionCallback : MediaLibrarySession.Callback {
+
+        private val playListLibraryRoot = MediaItem.Builder()
+            .setMediaId("PlayList")
+            .setMediaMetadata(MediaMetadata.Builder()
+                .setMediaType(MediaMetadata.MEDIA_TYPE_PLAYLIST)
+                .build()
+            )
+            .build()
+
         override fun onGetLibraryRoot(
             session: MediaLibrarySession,
             browser: MediaSession.ControllerInfo,
             params: LibraryParams?
         ): ListenableFuture<LibraryResult<MediaItem>> {
-            return future {
-                // TODO: 调用repo，转换为MediaItem
-                LibraryResult.ofItem(MediaItem.EMPTY, params)
-            }
-//            return super.onGetLibraryRoot(session, browser, params)
+            return Futures.immediateFuture(LibraryResult.ofItem(playListLibraryRoot, params))
         }
 
         override fun onGetItem(
@@ -59,7 +66,12 @@ class AudioLibraryService(val playListRepo: PlayListRepository) : MediaLibrarySe
             browser: MediaSession.ControllerInfo,
             mediaId: String
         ): ListenableFuture<LibraryResult<MediaItem>> {
-            return super.onGetItem(session, browser, mediaId)
+            super.onGetItem(session, browser, mediaId)
+            return future {
+                // TODO: 判断item是否是Offline
+                val item = playListRepo.getMediaItemStream(mediaId)
+                LibraryResult.ofItem(item, LibraryParams.Builder().setOffline(true).build())
+            }
         }
 
         override fun onGetChildren(
