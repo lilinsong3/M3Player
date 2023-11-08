@@ -5,10 +5,15 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
+import com.github.lilinsong3.m3player.data.repository.PlayListRepository
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.ListenableFuture
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.guava.future
 
-class AudioLibraryService: MediaLibraryService() {
+class AudioLibraryService(val playListRepo: PlayListRepository) : MediaLibraryService(), CoroutineScope by MainScope() {
     private var audioLibrarySession: MediaLibrarySession? = null
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession? =
         audioLibrarySession
@@ -23,6 +28,8 @@ class AudioLibraryService: MediaLibraryService() {
     }
 
     override fun onDestroy() {
+        // cancel MainScope
+        cancel()
         audioLibrarySession?.run {
             player.release()
             release()
@@ -34,13 +41,17 @@ class AudioLibraryService: MediaLibraryService() {
     }
 
     // TODO: Impl this
-    class AudioLibrarySessionCallback: MediaLibrarySession.Callback {
+     inner class AudioLibrarySessionCallback : MediaLibrarySession.Callback {
         override fun onGetLibraryRoot(
             session: MediaLibrarySession,
             browser: MediaSession.ControllerInfo,
             params: LibraryParams?
         ): ListenableFuture<LibraryResult<MediaItem>> {
-            return super.onGetLibraryRoot(session, browser, params)
+            return future {
+                // TODO: 调用repo，转换为MediaItem
+                LibraryResult.ofItem(MediaItem.EMPTY, params)
+            }
+//            return super.onGetLibraryRoot(session, browser, params)
         }
 
         override fun onGetItem(
