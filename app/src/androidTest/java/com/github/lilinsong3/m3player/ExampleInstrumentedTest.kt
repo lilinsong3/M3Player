@@ -1,12 +1,21 @@
 package com.github.lilinsong3.m3player
 
-import androidx.test.platform.app.InstrumentationRegistry
+import android.content.Context
+import androidx.room.Room
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-
+import androidx.test.platform.app.InstrumentationRegistry
+import com.github.lilinsong3.m3player.data.local.AppDatabase
+import com.github.lilinsong3.m3player.data.local.dao.PlayListDao
+import com.github.lilinsong3.m3player.data.local.entity.Song
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import org.junit.After
+import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-
-import org.junit.Assert.*
+import java.io.IOException
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -15,7 +24,37 @@ import org.junit.Assert.*
  */
 @RunWith(AndroidJUnit4::class)
 class ExampleInstrumentedTest {
+    private lateinit var playListDao: PlayListDao
+    private lateinit var db: AppDatabase
+
+    @Before
+    fun createDb() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
+        playListDao = db.playListDao()
+    }
+
+    @After
+    @Throws(IOException::class)
+    fun closeDb() {
+        db.close()
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
+    @Throws(Exception::class)
+    fun testPlayListDao() = runTest {
+        val song = Song(2, datetime = "2020-06-30")
+        playListDao.testInsert(song)
+        val list = playListDao.testQueryAll()
+        val model = playListDao.querySongById(5)
+        assert(list.isNotEmpty())
+        assertEquals(2, list[0].id)
+        assertEquals(null, model)
+    }
+
+    @Test
+    @Throws(Exception::class)
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext

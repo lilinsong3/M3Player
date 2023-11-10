@@ -6,6 +6,6 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class PlayList(
-    @PrimaryKey val songId: Long,
+    @PrimaryKey val songId: Int,
     @ColumnInfo(defaultValue = "(datetime('now'))") val datetime: String
 )

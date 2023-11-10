@@ -8,7 +8,7 @@ import androidx.room.Entity
  */
 @Entity(primaryKeys = ["listId", "songId"])
 data class ListSong(
-    val listId: Long,
-    val songId: Long,
+    val listId: Int,
+    val songId: Int,
     @ColumnInfo(defaultValue = "(datetime('now'))") val datetime: String
 )

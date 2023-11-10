@@ -47,9 +47,12 @@ class AudioLibraryService(val playListRepo: PlayListRepository) : MediaLibrarySe
 
         private val playListLibraryRoot = MediaItem.Builder()
             .setMediaId("PlayList")
-            .setMediaMetadata(MediaMetadata.Builder()
-                .setMediaType(MediaMetadata.MEDIA_TYPE_PLAYLIST)
-                .build()
+            .setMediaMetadata(
+                MediaMetadata.Builder()
+                    .setMediaType(MediaMetadata.MEDIA_TYPE_PLAYLIST)
+                    .setIsBrowsable(false)
+                    .setIsPlayable(false)
+                    .build()
             )
             .build()
 
@@ -66,11 +69,10 @@ class AudioLibraryService(val playListRepo: PlayListRepository) : MediaLibrarySe
             browser: MediaSession.ControllerInfo,
             mediaId: String
         ): ListenableFuture<LibraryResult<MediaItem>> {
-            super.onGetItem(session, browser, mediaId)
             return future {
-                // TODO: 判断item是否是Offline
                 val item = playListRepo.getMediaItemStream(mediaId)
-                LibraryResult.ofItem(item, LibraryParams.Builder().setOffline(true).build())
+                // FIXME: item could be null
+                LibraryResult.ofItem(item, null)
             }
         }
 

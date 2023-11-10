@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
  */
 @Entity
 data class SongList(
-    @PrimaryKey(autoGenerate = true) val id: Long,
+    @PrimaryKey(autoGenerate = true) val id: Int,
     val name: String,
     val type: SongListType = SongListType.UNSET,
     @ColumnInfo(defaultValue = "(datetime('now'))") val datetime: String
