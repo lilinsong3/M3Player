@@ -43,13 +43,18 @@ class ExampleInstrumentedTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     @Throws(Exception::class)
-    fun testPlayListDao() = runTest {
+    fun testPlayListDaoQueryAll() = runTest {
         val song = Song(2, datetime = "2020-06-30")
         playListDao.testInsert(song)
         val list = playListDao.testQueryAll()
-        val model = playListDao.querySongById(5)
-        assert(list.isNotEmpty())
         assertEquals(2, list[0].id)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    @Throws(Exception::class)
+    fun testPlayListDaoQueryById() = runTest {
+        val model = playListDao.querySongById(5)
         assertEquals(null, model)
     }
 
