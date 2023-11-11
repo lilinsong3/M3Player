@@ -1,15 +1,6 @@
-package com.github.lilinsong3.m3player.data.local.entity
+package com.github.lilinsong3.m3player.data.model
 
-import androidx.room.*
-
-// TODO: 分词最好支持中英，研究一下languageId
-@Fts4(tokenizer = FtsOptions.TOKENIZER_ICU, tokenizerArgs = ["zh_CN"])
-@Entity
-data class Song(
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "rowid")
-    // 兼顾自动生成以及插入时需要实例化对象的需求，将id 默认为0，Insert时会看做未设置
-    val id: Int = 0,
+data class PartialSongModel(
     val title: String = "Unknown",
     val artist: String = "Unknown",
     val albumTitle: String = title,
@@ -32,7 +23,5 @@ data class Song(
     val totalDiscCount: Int? = null,
     val genre: String? = null,
     val compilation: String? = null,
-    val duration: String = "?",
-    @ColumnInfo(defaultValue = "(datetime('now'))")
-    val datetime: String
+    val duration: String = "?"
 )

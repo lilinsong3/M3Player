@@ -17,6 +17,11 @@ import kotlinx.coroutines.guava.future
 
 class AudioLibraryService(val playListRepo: PlayListRepository) : MediaLibraryService(), CoroutineScope by MainScope() {
     private var audioLibrarySession: MediaLibrarySession? = null
+
+    companion object {
+        const val PLAY_LIST_ROOT_ID = "PlayList"
+    }
+
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession? =
         audioLibrarySession
 
@@ -44,9 +49,8 @@ class AudioLibraryService(val playListRepo: PlayListRepository) : MediaLibrarySe
 
     // TODO: Impl this
      inner class AudioLibrarySessionCallback : MediaLibrarySession.Callback {
-
         private val playListLibraryRoot = MediaItem.Builder()
-            .setMediaId("PlayList")
+            .setMediaId(PLAY_LIST_ROOT_ID)
             .setMediaMetadata(
                 MediaMetadata.Builder()
                     .setMediaType(MediaMetadata.MEDIA_TYPE_PLAYLIST)
@@ -69,10 +73,11 @@ class AudioLibraryService(val playListRepo: PlayListRepository) : MediaLibrarySe
             browser: MediaSession.ControllerInfo,
             mediaId: String
         ): ListenableFuture<LibraryResult<MediaItem>> {
+            super.onGetItem(session, browser, mediaId)
             return future {
-                val item = playListRepo.getMediaItemStream(mediaId)
-                // FIXME: item could be null
-                LibraryResult.ofItem(item, null)
+                val item = playListRepo.getMediaItem(mediaId)
+                if (item == null) LibraryResult.ofError(LibraryResult.RESULT_ERROR_BAD_VALUE)
+                else LibraryResult.ofItem(item, null)
             }
         }
 
@@ -84,7 +89,11 @@ class AudioLibraryService(val playListRepo: PlayListRepository) : MediaLibrarySe
             pageSize: Int,
             params: LibraryParams?
         ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-            return super.onGetChildren(session, browser, parentId, page, pageSize, params)
+            super.onGetChildren(session, browser, parentId, page, pageSize, params)
+            return if (parentId == PLAY_LIST_ROOT_ID) future {
+                LibraryResult.ofItemList(playListRepo.getMediaItems(page, pageSize), params)
+            }
+            else Futures.immediateFuture(LibraryResult.ofError(LibraryResult.RESULT_ERROR_BAD_VALUE))
         }
 
         override fun onSubscribe(

@@ -7,7 +7,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.github.lilinsong3.m3player.data.local.AppDatabase
 import com.github.lilinsong3.m3player.data.local.dao.PlayListDao
-import com.github.lilinsong3.m3player.data.local.entity.Song
+import com.github.lilinsong3.m3player.data.local.dao.SongDao
+import com.github.lilinsong3.m3player.data.model.PartialSongModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -24,6 +25,7 @@ import java.io.IOException
  */
 @RunWith(AndroidJUnit4::class)
 class ExampleInstrumentedTest {
+    private lateinit var songDao: SongDao
     private lateinit var playListDao: PlayListDao
     private lateinit var db: AppDatabase
 
@@ -31,6 +33,7 @@ class ExampleInstrumentedTest {
     fun createDb() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
+        songDao = db.songDao()
         playListDao = db.playListDao()
     }
 
@@ -44,10 +47,10 @@ class ExampleInstrumentedTest {
     @Test
     @Throws(Exception::class)
     fun testPlayListDaoQueryAll() = runTest {
-        val song = Song(2, datetime = "2020-06-30")
-        playListDao.testInsert(song)
-        val list = playListDao.testQueryAll()
-        assertEquals(2, list[0].id)
+        val song = PartialSongModel()
+        songDao.insert(song)
+        val list = songDao.queryAll()
+        assertEquals(1, list[0].id)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
