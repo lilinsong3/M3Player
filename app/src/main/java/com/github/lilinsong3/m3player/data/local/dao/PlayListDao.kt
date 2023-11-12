@@ -26,4 +26,10 @@ interface PlayListDao {
             "OR s.artist LIKE '%' || :keyword || '%' " +
             "LIMIT (:page - 1) * :pageSize, :pageSize")
     suspend fun searchSongs(keyword: String, page: Int, pageSize: Int): List<SongModel>
+
+    /**
+     * @return 新插入的id列表
+     */
+    @Query("INSERT INTO PlayList (songId) SELECT rowid FROM Song WHERE rowid IN (:ids)")
+    suspend fun insertByIds(ids: List<Int>): List<Int>
 }

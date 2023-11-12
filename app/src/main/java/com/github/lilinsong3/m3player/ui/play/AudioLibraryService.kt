@@ -7,6 +7,7 @@ import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import com.github.lilinsong3.m3player.data.repository.PlayListRepository
+import com.github.lilinsong3.m3player.data.repository.SongRepository
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
@@ -16,7 +17,10 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.launch
 
-class AudioLibraryService(val playListRepo: PlayListRepository) : MediaLibraryService(), CoroutineScope by MainScope() {
+class AudioLibraryService(
+    val playListRepo: PlayListRepository,
+    val songRepo: SongRepository
+) : MediaLibraryService(), CoroutineScope by MainScope() {
     private var audioLibrarySession: MediaLibrarySession? = null
 
     companion object {
@@ -97,23 +101,6 @@ class AudioLibraryService(val playListRepo: PlayListRepository) : MediaLibrarySe
             else Futures.immediateFuture(LibraryResult.ofError(LibraryResult.RESULT_ERROR_BAD_VALUE))
         }
 
-        override fun onSubscribe(
-            session: MediaLibrarySession,
-            browser: MediaSession.ControllerInfo,
-            parentId: String,
-            params: LibraryParams?
-        ): ListenableFuture<LibraryResult<Void>> {
-            return super.onSubscribe(session, browser, parentId, params)
-        }
-
-        override fun onUnsubscribe(
-            session: MediaLibrarySession,
-            browser: MediaSession.ControllerInfo,
-            parentId: String
-        ): ListenableFuture<LibraryResult<Void>> {
-            return super.onUnsubscribe(session, browser, parentId)
-        }
-
         override fun onSearch(
             session: MediaLibrarySession,
             browser: MediaSession.ControllerInfo,
@@ -121,7 +108,7 @@ class AudioLibraryService(val playListRepo: PlayListRepository) : MediaLibrarySe
             params: LibraryParams?
         ): ListenableFuture<LibraryResult<Void>> {
             launch {
-                audioLibrarySession?.notifySearchResultChanged(
+                session.notifySearchResultChanged(
                     browser,
                     query,
                     playListRepo.countMatchedSongs(query),
@@ -139,7 +126,22 @@ class AudioLibraryService(val playListRepo: PlayListRepository) : MediaLibrarySe
             pageSize: Int,
             params: LibraryParams?
         ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-            return super.onGetSearchResult(session, browser, query, page, pageSize, params)
+            return future {
+                LibraryResult.ofItemList(playListRepo.searchSongs(query, page, pageSize), params)
+            }
+        }
+
+        override fun onAddMediaItems(
+            mediaSession: MediaSession,
+            controller: MediaSession.ControllerInfo,
+            mediaItems: MutableList<MediaItem>
+        ): ListenableFuture<MutableList<MediaItem>> {
+            return future {
+                // TODO: optimize this
+                mediaItems.filter { it ->
+                    playListRepo.add(mediaItems.map { it.mediaId.toInt() }).contains(it.mediaId.toInt())
+                }.toMutableList()
+            }
         }
 
         override fun onPlaybackResumption(
