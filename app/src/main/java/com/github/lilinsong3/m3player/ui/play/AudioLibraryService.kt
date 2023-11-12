@@ -14,6 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.guava.future
+import kotlinx.coroutines.launch
 
 class AudioLibraryService(val playListRepo: PlayListRepository) : MediaLibraryService(), CoroutineScope by MainScope() {
     private var audioLibrarySession: MediaLibrarySession? = null
@@ -119,7 +120,15 @@ class AudioLibraryService(val playListRepo: PlayListRepository) : MediaLibrarySe
             query: String,
             params: LibraryParams?
         ): ListenableFuture<LibraryResult<Void>> {
-            return super.onSearch(session, browser, query, params)
+            launch {
+                audioLibrarySession?.notifySearchResultChanged(
+                    browser,
+                    query,
+                    playListRepo.countMatchedSongs(query),
+                    params
+                )
+            }
+            return Futures.immediateFuture(LibraryResult.ofVoid(params))
         }
 
         override fun onGetSearchResult(

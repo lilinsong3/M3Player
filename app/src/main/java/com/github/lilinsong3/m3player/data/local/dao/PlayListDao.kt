@@ -11,4 +11,19 @@ interface PlayListDao {
 
     @Query("SELECT s.rowid id, s.* FROM Song s INNER JOIN PlayList pl ON s.rowid = pl.songId LIMIT (:page - 1) * :pageSize, :pageSize")
     suspend fun querySongs(page: Int, pageSize: Int): List<SongModel>
+
+    @Query("SELECT count(s.rowid) FROM Song s " +
+            "INNER JOIN PlayList pl ON s.rowid = pl.songId " +
+            "WHERE Song MATCH :keyword " +
+            "OR s.title LIKE '%' || :keyword || '%' " +
+            "OR s.artist LIKE '%' || :keyword || '%'")
+    suspend fun queryMatchedNum(keyword: String): Int
+
+    @Query("SELECT s.rowid id, s.* FROM Song s " +
+            "INNER JOIN PlayList pl ON s.rowid = pl.songId " +
+            "WHERE Song MATCH :keyword " +
+            "OR s.title LIKE '%' || :keyword || '%' " +
+            "OR s.artist LIKE '%' || :keyword || '%' " +
+            "LIMIT (:page - 1) * :pageSize, :pageSize")
+    suspend fun searchSongs(keyword: String, page: Int, pageSize: Int): List<SongModel>
 }
