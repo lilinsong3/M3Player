@@ -52,7 +52,7 @@ class AudioLibraryService(
         super.onDestroy()
     }
 
-     inner class AudioLibrarySessionCallback : MediaLibrarySession.Callback {
+    inner class AudioLibrarySessionCallback : MediaLibrarySession.Callback {
         private val playListLibraryRoot = MediaItem.Builder()
             .setMediaId(PLAY_LIST_ROOT_ID)
             .setMediaMetadata(
@@ -184,7 +184,7 @@ class AudioLibraryService(
                 val startItem = items.find { item -> item.mediaId == songId.toString() }
                 MediaItemsWithStartPosition(
                     items,
-                    if (startItem == null) C.INDEX_UNSET else items.indexOf(startItem) ,
+                    if (startItem == null) C.INDEX_UNSET else items.indexOf(startItem),
                     currentPosition
                 )
             }
