@@ -1,7 +1,7 @@
 package com.github.lilinsong3.m3player.data.repository
 
 import androidx.media3.common.MediaItem
-import com.github.lilinsong3.m3player.ui.play.PlayingInfoModel
+import com.github.lilinsong3.m3player.data.model.PlayingInfoModel
 import kotlinx.coroutines.flow.Flow
 
 interface PlayListRepository {

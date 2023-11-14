@@ -23,6 +23,9 @@ interface PlayListDao {
             "INNER JOIN PlayList pl ON s.rowid = pl.songId")
     suspend fun queryNum(): Int
 
+    @Query("SELECT s.rowid id, s.* FROM Song s INNER JOIN PlayList pl ON s.rowid = pl.songId")
+    suspend fun queryAll(): List<SongModel>
+
     @Query("SELECT s.rowid id, s.* FROM Song s " +
             "INNER JOIN PlayList pl ON s.rowid = pl.songId " +
             "WHERE Song MATCH :keyword " +

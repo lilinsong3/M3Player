@@ -10,6 +10,7 @@ data class Song(
     @ColumnInfo(name = "rowid")
     // 兼顾自动生成以及插入时需要实例化对象的需求，将id 默认为0，Insert时会看做未设置
     val id: Int = 0,
+    val path: String? = null,
     val title: String = "Unknown",
     val artist: String = "Unknown",
     val albumTitle: String = title,
