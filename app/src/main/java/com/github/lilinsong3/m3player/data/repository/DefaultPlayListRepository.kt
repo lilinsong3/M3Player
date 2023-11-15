@@ -45,8 +45,8 @@ class DefaultPlayListRepository @Inject constructor(
     override suspend fun searchSongs(keyword: String, page: Int, pageSize: Int): List<MediaItem> =
         playListDao.searchSongs(keyword, page, pageSize).mapNotNull { SongModel.toMediaItem(it) }
 
-    override suspend fun add(ids: List<Int>): List<Int> =
-        playListDao.insertByIds(ids)
+    override suspend fun add(ids: List<Int>): List<Int> = listOf()
+//        playListDao.insertByIds(ids).map { it.toInt() }
 
     override fun getPlayingInfoStream(): Flow<PlayingInfoModel> = playingInfoDataStore.data
         .catch { exception ->

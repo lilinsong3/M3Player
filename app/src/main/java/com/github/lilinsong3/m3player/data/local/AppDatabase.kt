@@ -8,7 +8,8 @@ import com.github.lilinsong3.m3player.data.local.entity.*
 
 @Database(
     entities = [Song::class, SongList::class, ListSong::class, PlayList::class, PlayHistory::class],
-    version = 1
+    version = 1,
+    exportSchema = false /* TODO: to delete */
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun playListDao(): PlayListDao

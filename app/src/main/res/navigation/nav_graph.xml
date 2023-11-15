@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/playFragment"
         android:name="com.github.lilinsong3.m3player.ui.play.PlayFragment"
-        tools:layout="@layout/fragment_play" />
+        tools:layout="@layout/test" />
 
 
 </navigation>

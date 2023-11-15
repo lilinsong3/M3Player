@@ -1,6 +1,7 @@
 package com.github.lilinsong3.m3player
 
 import android.content.Context
+import android.util.Log
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -8,7 +9,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.github.lilinsong3.m3player.data.local.AppDatabase
 import com.github.lilinsong3.m3player.data.local.dao.PlayListDao
 import com.github.lilinsong3.m3player.data.local.dao.SongDao
-import com.github.lilinsong3.m3player.data.model.PartialSongModel
+import com.github.lilinsong3.m3player.data.model.SongModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -46,11 +47,41 @@ class ExampleInstrumentedTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     @Throws(Exception::class)
-    fun testPlayListDaoQueryAll() = runTest {
-        val song = PartialSongModel()
-        songDao.insert(song)
+    fun testSongDaoQueryAll() = runTest {
+
+        SongModel(datetime = "2023-11-15").apply {
+            songDao.insert(
+                path,
+                title,
+                artist,
+                albumTitle,
+                albumArtist,
+                displayTitle,
+                subtitle,
+                description,
+                artworkLocation,
+                lyricLocation,
+                recordingYear,
+                recordingMonth,
+                recordingDay,
+                releaseYear,
+                releaseMonth,
+                releaseDay,
+                writer,
+                composer,
+                conductor,
+                discNumber,
+                totalDiscCount,
+                genre,
+                compilation,
+                duration,
+                datetime
+            )
+        }
         val list = songDao.queryAll()
-        assertEquals(1, list[0].id)
+        Log.println(Log.ASSERT, "testSongDaoQueryAll()", "query all = $list")
+        assertNotEquals(0, list[0].id)
+        assertTrue(list[0].datetime.startsWith("2023"))
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
