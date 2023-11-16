@@ -8,6 +8,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import com.github.lilinsong3.m3player.data.local.dao.PlayListDao
 import com.github.lilinsong3.m3player.data.model.PlayingInfoModel
+import com.github.lilinsong3.m3player.data.model.SongKeyModel
 import com.github.lilinsong3.m3player.data.model.SongModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -45,8 +46,8 @@ class DefaultPlayListRepository @Inject constructor(
     override suspend fun searchSongs(keyword: String, page: Int, pageSize: Int): List<MediaItem> =
         playListDao.searchSongs(keyword, page, pageSize).mapNotNull { SongModel.toMediaItem(it) }
 
-    override suspend fun add(ids: List<Int>): List<Int> = listOf()
-//        playListDao.insertByIds(ids).map { it.toInt() }
+    override suspend fun add(ids: List<Int>): List<Int> =
+        playListDao.insertByIds(ids.map { SongKeyModel(it) }).map { it.toInt() }
 
     override fun getPlayingInfoStream(): Flow<PlayingInfoModel> = playingInfoDataStore.data
         .catch { exception ->
