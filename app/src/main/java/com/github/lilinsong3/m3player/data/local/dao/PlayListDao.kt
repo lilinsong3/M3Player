@@ -1,6 +1,8 @@
 package com.github.lilinsong3.m3player.data.local.dao
 
 import androidx.room.*
+import com.github.lilinsong3.m3player.data.local.entity.PlayList
+import com.github.lilinsong3.m3player.data.model.SongKeyModel
 import com.github.lilinsong3.m3player.data.model.SongModel
 
 @Dao
@@ -37,7 +39,9 @@ interface PlayListDao {
     /**
      * @return 新插入的id列表
      */
-//    @Query("INSERT INTO PlayList (songId) SELECT rowid FROM Song WHERE rowid IN (:ids)")
-//    @Insert
-//    suspend fun insertByIds(ids: List<Int>): List<Long>
+    @Insert(entity = PlayList::class)
+    fun insertByIds(ids: List<SongKeyModel>): List<Long>
+
+    @Query("SELECT * FROM PlayList")
+    suspend fun queryAllRaw(): List<PlayList>
 }

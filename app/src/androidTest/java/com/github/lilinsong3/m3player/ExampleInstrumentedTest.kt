@@ -9,6 +9,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.github.lilinsong3.m3player.data.local.AppDatabase
 import com.github.lilinsong3.m3player.data.local.dao.PlayListDao
 import com.github.lilinsong3.m3player.data.local.dao.SongDao
+import com.github.lilinsong3.m3player.data.model.SongKeyModel
 import com.github.lilinsong3.m3player.data.model.SongModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -90,6 +91,19 @@ class ExampleInstrumentedTest {
     fun testPlayListDaoQueryById() = runTest {
         val model = playListDao.querySongById(5)
         assertEquals(null, model)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    @Throws(Exception::class)
+    fun testPlayListDaoInsertBatch() = runTest {
+        val tag = "testPlayListDaoInsertBatch()"
+        val list = playListDao.insertByIds(listOf(SongKeyModel(1)))
+        Log.println(Log.ASSERT, tag, "insert list = $list")
+        assertEquals(1, list[0])
+        val rawList = playListDao.queryAllRaw()
+        Log.println(Log.ASSERT, tag, "PlayList = $rawList")
+        assertNotNull(rawList[0].datetime)
     }
 
     @Test
