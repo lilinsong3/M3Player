@@ -6,4 +6,5 @@
     <dimen name="extra_large_size">240dp</dimen>
     <dimen name="padding_small">8dp</dimen>
     <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_medium">16dp</dimen>
 </resources>

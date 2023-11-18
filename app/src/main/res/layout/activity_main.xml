@@ -14,7 +14,7 @@
         app:defaultNavHost="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:navGraph="@navigation/nav_graph"
-        tools:layout="@layout/fragment_play" />
+        tools:layout="@layout/fragment_library" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
@@ -53,13 +53,12 @@
             android:id="@+id/main_img_song"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_margin="@dimen/margin_small"
-            android:contentDescription="@string/album_cover"
+            android:padding="@dimen/padding_small"
+            android:contentDescription="@string/album_artwork"
             android:minHeight="@dimen/medium_size"
-            android:src="@drawable/ic_app_logo"
+            android:src="@drawable/ic_album"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintEnd_toStartOf="@id/main_guideline"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -79,17 +78,10 @@
             android:layout_height="wrap_content"
             android:textAppearance="?attr/textAppearanceTitleLarge"
             app:layout_constraintBottom_toTopOf="@id/main_text_singer"
-            app:layout_constraintStart_toEndOf="@id/main_guideline"
+            app:layout_constraintStart_toEndOf="@id/main_img_song"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
             tools:text="歌曲名称" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/main_guideline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_begin="82dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

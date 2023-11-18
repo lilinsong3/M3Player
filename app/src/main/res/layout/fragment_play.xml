@@ -69,17 +69,16 @@
         android:id="@+id/play_song_pic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/album_cover"
+        android:contentDescription="@string/album_artwork"
         android:minWidth="@dimen/extra_large_size"
         android:minHeight="@dimen/extra_large_size"
-        android:src="@drawable/ic_app_logo"
+        android:src="@drawable/ic_album"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/play_toolbar"
         app:layout_constraintVertical_bias=".2"
-        app:roundPercent="1"
-        tools:background="?attr/colorPrimary" />
+        app:roundPercent="1" />
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/play_toolbar"
