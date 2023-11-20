@@ -10,6 +10,8 @@ import android.provider.MediaStore
 import androidx.annotation.RequiresApi
 import com.github.lilinsong3.m3player.data.model.SongItemModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -57,7 +59,7 @@ class DefaultSongRepository @Inject constructor(@ApplicationContext private val 
         )
     }
 
-    override suspend fun getAllLocalSongs(page: Int, pageSize: Int): List<SongItemModel> {
+    override suspend fun getAllLocalSongs(page: Int, pageSize: Int): List<SongItemModel> = withContext(Dispatchers.IO) {
         val songs = mutableListOf<SongItemModel>()
         getQueryCursor(page, pageSize)?.use { cursor ->
             val idCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
@@ -81,6 +83,6 @@ class DefaultSongRepository @Inject constructor(@ApplicationContext private val 
                 )
             }
         }
-        return songs
+        songs
     }
 }
