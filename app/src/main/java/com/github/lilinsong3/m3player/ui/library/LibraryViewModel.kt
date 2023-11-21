@@ -15,7 +15,7 @@ import javax.inject.Inject
 class LibraryViewModel @Inject constructor(private val songRepository: SongRepository) :
     ViewModel() {
     private val _mutableSongsFlow: MutableStateFlow<LibraryState> = MutableStateFlow(
-        LibraryState.Success(loading = true)
+        LibraryState.Loading
     )
     val songsFlow: StateFlow<LibraryState> = _mutableSongsFlow.asStateFlow()
 
@@ -27,8 +27,8 @@ class LibraryViewModel @Inject constructor(private val songRepository: SongRepos
         viewModelScope.launch {
             try {
                 _mutableSongsFlow.value = LibraryState.Success(
-                    _mutableSongsFlow.value.songItemModels + songRepository.getAllLocalSongs(
-                        _mutableSongsFlow.value.songItemModels.size / pageSize + 1,
+                    songRepository.getAllLocalSongs(
+                        1,
                         pageSize
                     )
                 )

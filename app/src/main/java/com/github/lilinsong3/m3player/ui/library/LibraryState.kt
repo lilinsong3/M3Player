@@ -2,15 +2,13 @@ package com.github.lilinsong3.m3player.ui.library
 
 import com.github.lilinsong3.m3player.data.model.SongItemModel
 
-sealed class LibraryState(
-    open val songItemModels: List<SongItemModel>  = listOf(),
-    open val loading: Boolean
-) {
-    data class Success(
-        override val songItemModels: List<SongItemModel> = listOf(),
-        override val loading: Boolean = false
-    ) : LibraryState(songItemModels, loading)
+sealed interface LibraryState {
 
-    data class Error(val msg: String, override val loading: Boolean = false) :
-        LibraryState(loading = loading)
+    data object Loading : LibraryState
+
+    data class Success(
+        val songItemModels: List<SongItemModel> = listOf()
+    ) : LibraryState
+
+    data class Error(val msg: String) : LibraryState
 }
