@@ -68,7 +68,7 @@ dependencies {
     implementation "androidx.room:room-paging:$room_version"
 
     // Kotlinx, guava
-    def coroutines_version = "1.6.4"
+    def coroutines_version = "1.7.3"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-guava:$coroutines_version"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
     androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
