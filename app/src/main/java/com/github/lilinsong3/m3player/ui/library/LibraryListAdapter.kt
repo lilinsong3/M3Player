@@ -1,31 +1,37 @@
 package com.github.lilinsong3.m3player.ui.library
 
+import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.github.lilinsong3.m3player.data.model.SongItemModel
+import com.github.lilinsong3.m3player.common.DefaultDiffItemCallback
 import com.github.lilinsong3.m3player.databinding.ItemSongBinding
 
 class LibraryListAdapter :
-    ListAdapter<SongItemModel, LibraryListAdapter.SongItemViewHolder>(object :
-        DiffUtil.ItemCallback<SongItemModel>() {
-        override fun areItemsTheSame(oldItem: SongItemModel, newItem: SongItemModel): Boolean =
-            oldItem.id == newItem.id
-
-        override fun areContentsTheSame(oldItem: SongItemModel, newItem: SongItemModel): Boolean =
-            oldItem == newItem
-    }) {
+    ListAdapter<LibraryItemState, LibraryListAdapter.SongItemViewHolder>(DefaultDiffItemCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongItemViewHolder {
-        TODO("Not yet implemented")
+        return SongItemViewHolder(
+            ItemSongBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
+        )
     }
 
     override fun onBindViewHolder(holder: SongItemViewHolder, position: Int) {
-        TODO("Not yet implemented")
+        holder.bind(getItem(position))
     }
 
     class SongItemViewHolder(private val binding: ItemSongBinding) : ViewHolder(binding.root) {
-
+        fun bind(itemState: LibraryItemState) {
+            binding.apply {
+                itemTextSong.text = itemState.item.name
+                itemTextSinger.text = itemState.item.artist
+                itemTextDuration.text = itemState.item.duration
+            }
+            itemView.setOnClickListener{ itemState.onClick() }
+        }
     }
 }
