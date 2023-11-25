@@ -11,6 +11,6 @@ interface PlayListRepository {
     suspend fun countMatchedSongs(keyword: String): Int
     suspend fun countSongs(): Int
     suspend fun searchSongs(keyword: String, page: Int, pageSize: Int): List<MediaItem>
-    suspend fun add(ids: List<Int>): List<Int>
+    suspend fun add(ids: List<Long>): List<Long>
     fun getPlayingInfoStream(): Flow<PlayingInfoModel>
 }

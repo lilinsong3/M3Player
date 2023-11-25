@@ -4,15 +4,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.lilinsong3.m3player.common.Differentiable
 import com.github.lilinsong3.m3player.data.model.SongItemModel
+import com.github.lilinsong3.m3player.data.repository.PlayListRepository
 import com.github.lilinsong3.m3player.data.repository.SongRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LibraryViewModel @Inject constructor(private val songRepository: SongRepository) :
-    ViewModel() {
+class LibraryViewModel @Inject constructor(
+    private val songRepository: SongRepository, private val playListRepository: PlayListRepository
+) : ViewModel() {
 
     private val _cachedSongItems: MutableStateFlow<List<LibraryItemState>> =
         MutableStateFlow(listOf())
@@ -21,15 +24,25 @@ class LibraryViewModel @Inject constructor(private val songRepository: SongRepos
     val libraryUiState: StateFlow<LibraryState> =
         _cachedSongItems.flatMapLatest<List<LibraryItemState>, LibraryState> { oldItems ->
             songRepository.getLocalSongsStream(
-                oldItems.size / DEFAULT_PAGE_SIZE + 1,
-                DEFAULT_PAGE_SIZE
-            ).map { LibraryState.Success(oldItems + it.map(::LibraryItemState)) }
+                oldItems.size / DEFAULT_PAGE_SIZE + 1, DEFAULT_PAGE_SIZE
+            ).map { newModels ->
+                LibraryState.Success(oldItems + newModels.map { model ->
+                    // TODO: add to playList and play it
+                    LibraryItemState(model) { addToPlayList(oldItems.map { it.item.id } + newModels.map { it.id }) }
+                })
+            }
         }.catch { emit(LibraryState.Error("出错了")) }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LibraryState.Loading)
 
     fun loadMoreItems() {
         if (libraryUiState.value is LibraryState.Success) {
             _cachedSongItems.update { (libraryUiState.value as LibraryState.Success).items }
+        }
+    }
+
+    private fun addToPlayList(ids: List<Long>) {
+        viewModelScope.launch {
+            playListRepository.add(ids)
         }
     }
 

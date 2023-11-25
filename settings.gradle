@@ -12,5 +12,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "M3 Player"
+rootProject.name = "M3Player"
 include ':app'
