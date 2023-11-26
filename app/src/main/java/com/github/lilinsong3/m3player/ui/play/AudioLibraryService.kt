@@ -1,5 +1,6 @@
 package com.github.lilinsong3.m3player.ui.play
 
+import android.content.Intent
 import android.util.Log
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -9,6 +10,7 @@ import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSession.MediaItemsWithStartPosition
+import com.github.lilinsong3.m3player.data.model.PlayingInfoModel
 import com.github.lilinsong3.m3player.data.repository.PlayListRepository
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
@@ -39,16 +41,39 @@ class AudioLibraryService(
         ).build()
     }
 
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        audioLibrarySession?.player!!.run {
+            if (playWhenReady) {
+                pause()
+            }
+        }
+        stopSelf()
+    }
+
     override fun onDestroy() {
         // cancel MainScope
-        cancel()
-        audioLibrarySession?.run {
-            player.release()
-            release()
-            // listener for service should be cleared if setListener() for service is called
-            // clearListener()
-            audioLibrarySession = null
+        // TODO: save playingInfo here, and onPause as well
+        val player = audioLibrarySession?.player!!
+        player.currentMediaItem?.run {
+            launch {
+                playListRepo.savePlayingInfo(
+                    PlayingInfoModel(
+                        mediaId.toLong(),
+                        player.repeatMode,
+                        player.shuffleModeEnabled,
+                        player.currentPosition
+                    )
+                )
+            }
         }
+        // cancel CoroutineScope
+        cancel()
+        player.release()
+        audioLibrarySession?.release()
+        // listener for service should be cleared if setListener() for service is called
+        // clearListener()
+        audioLibrarySession = null
         super.onDestroy()
     }
 
@@ -163,17 +188,19 @@ class AudioLibraryService(
         ): ListenableFuture<MutableList<MediaItem>> = future(Dispatchers.IO) {
             mediaItems.filter {
                 playListRepo.add(mediaItems.map { item ->
-                    item.mediaId.toInt()
-                }).contains(it.mediaId.toInt())
+                    item.mediaId.toLong()
+                }).contains(it.mediaId.toLong())
             }.toMutableList()
         }
 
+        @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
         override fun onPlaybackResumption(
             mediaSession: MediaSession,
             controller: MediaSession.ControllerInfo
         ): ListenableFuture<MediaItemsWithStartPosition> = future(Dispatchers.IO) {
             Log.i(TAG, "in onPlaybackResumption() of session callback, start to resume playback")
             // TODO: test this completely to make sure that this works
+            // super.onPlaybackResumption(mediaSession, controller)
             playListRepo.getPlayingInfoStream().first().run {
                 Log.i(TAG, "in onPlaybackResumption() of session callback, start resuming playback")
                 mediaSession.player.also {

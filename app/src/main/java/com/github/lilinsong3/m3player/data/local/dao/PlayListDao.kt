@@ -40,7 +40,7 @@ interface PlayListDao {
      * @return 新的id列表
      */
     @Upsert(entity = PlayList::class)
-    fun upsertByIds(ids: List<SongIdOnly>): List<Long>
+    suspend fun upsertByIds(ids: List<SongIdOnly>): List<Long>
 
     @Query("SELECT * FROM PlayList")
     suspend fun queryAllRaw(): List<PlayList>

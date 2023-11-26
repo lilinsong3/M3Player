@@ -25,7 +25,7 @@ class DefaultPlayListRepository @Inject constructor(
 ) : PlayListRepository {
 
     companion object {
-        val SONG_ID = intPreferencesKey("song_id")
+        val SONG_ID = longPreferencesKey("song_id")
         val REPEAT_MODE = intPreferencesKey("repeat_mode")
         val SHUFFLE_MODE = booleanPreferencesKey("shuffle_mode")
         val CURRENT_POSITION = longPreferencesKey("curr_position")
@@ -62,10 +62,21 @@ class DefaultPlayListRepository @Inject constructor(
                 }
             }.map { preferences ->
                 PlayingInfoModel(
-                    preferences[SONG_ID] ?: 0,
+                    preferences[SONG_ID] ?: 0L,
                     preferences[REPEAT_MODE] ?: Player.REPEAT_MODE_ALL,
                     preferences[SHUFFLE_MODE] ?: true,
                     preferences[CURRENT_POSITION] ?: 0L,
                 )
             }
+
+    override suspend fun savePlayingInfo(playingInfo: PlayingInfoModel) {
+        playingInfoDataStore.edit { prefs ->
+            playingInfo.run {
+                prefs[SONG_ID]  = songId
+                prefs[REPEAT_MODE]  = repeatMode
+                prefs[SHUFFLE_MODE]  = shuffleMode
+                prefs[CURRENT_POSITION]  = currentPosition
+            }
+        }
+    }
 }

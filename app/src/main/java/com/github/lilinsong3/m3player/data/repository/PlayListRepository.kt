@@ -13,4 +13,6 @@ interface PlayListRepository {
     suspend fun searchSongs(keyword: String, page: Int, pageSize: Int): List<MediaItem>
     suspend fun add(ids: List<Long>): List<Long>
     fun getPlayingInfoStream(): Flow<PlayingInfoModel>
+
+    suspend fun savePlayingInfo(playingInfo: PlayingInfoModel)
 }
