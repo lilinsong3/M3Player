@@ -2,10 +2,14 @@ package com.github.lilinsong3.m3player.ui.play
 
 import android.content.Intent
 import android.util.Log
+import androidx.annotation.OptIn
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.util.EventLogger
 import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
@@ -34,9 +38,19 @@ class AudioLibraryService(
 
     override fun onCreate() {
         super.onCreate()
+        val exoPlayer = ExoPlayer.Builder(this).build()
+        exoPlayer.addAnalyticsListener(EventLogger())
+        exoPlayer.addListener(object : Player.Listener {
+            override fun onEvents(player: Player, events: Player.Events) {
+                super.onEvents(player, events)
+                if (events.contains(Player.EVENT_IS_PLAYING_CHANGED)) {
+                    savePlayState(player)
+                }
+            }
+        })
         audioLibrarySession = MediaLibrarySession.Builder(
             this,
-            ExoPlayer.Builder(this).build(),
+            exoPlayer,
             AudioLibrarySessionCallback()
         ).build()
     }
@@ -53,8 +67,19 @@ class AudioLibraryService(
 
     override fun onDestroy() {
         // cancel MainScope
-        // TODO: save playingInfo here, and onPause as well
         val player = audioLibrarySession?.player!!
+        savePlayState(player)
+        // cancel CoroutineScope
+        cancel()
+        player.release()
+        audioLibrarySession?.release()
+        // listener of service should be cleared if setListener() for service is called
+        // clearListener()
+        audioLibrarySession = null
+        super.onDestroy()
+    }
+
+    private fun savePlayState(player: Player) {
         player.currentMediaItem?.run {
             launch {
                 playListRepo.savePlayingInfo(
@@ -67,17 +92,9 @@ class AudioLibraryService(
                 )
             }
         }
-        // cancel CoroutineScope
-        cancel()
-        player.release()
-        audioLibrarySession?.release()
-        // listener for service should be cleared if setListener() for service is called
-        // clearListener()
-        audioLibrarySession = null
-        super.onDestroy()
     }
 
-    inner class AudioLibrarySessionCallback : MediaLibrarySession.Callback {
+    private inner class AudioLibrarySessionCallback : MediaLibrarySession.Callback {
         private val playListLibraryRoot = MediaItem.Builder()
             .setMediaId(PLAY_LIST_ROOT_ID)
             .setMediaMetadata(
@@ -101,7 +118,7 @@ class AudioLibraryService(
             session: MediaLibrarySession,
             browser: MediaSession.ControllerInfo,
             mediaId: String
-        ): ListenableFuture<LibraryResult<MediaItem>> = future(Dispatchers.IO) {
+        ): ListenableFuture<LibraryResult<MediaItem>> = future {
             try {
                 val item = playListRepo.getMediaItem(mediaId.toInt())
                 if (item == null) LibraryResult.ofError(LibraryResult.RESULT_ERROR_BAD_VALUE)
@@ -120,7 +137,7 @@ class AudioLibraryService(
             pageSize: Int,
             params: LibraryParams?
         ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> =
-            if (parentId == PLAY_LIST_ROOT_ID) future(Dispatchers.IO) {
+            if (parentId == PLAY_LIST_ROOT_ID) future {
                 LibraryResult.ofItemList(playListRepo.getMediaItems(page, pageSize), params)
             }
             else Futures.immediateFuture(LibraryResult.ofError(LibraryResult.RESULT_ERROR_BAD_VALUE))
@@ -132,7 +149,7 @@ class AudioLibraryService(
             params: LibraryParams?
         ): ListenableFuture<LibraryResult<Void>> {
             if (parentId == PLAY_LIST_ROOT_ID) {
-                launch(Dispatchers.IO) {
+                launch {
                     session.notifyChildrenChanged(
                         browser,
                         parentId,
@@ -145,21 +162,13 @@ class AudioLibraryService(
             return Futures.immediateFuture(LibraryResult.ofError(LibraryResult.RESULT_ERROR_BAD_VALUE))
         }
 
-        override fun onUnsubscribe(
-            session: MediaLibrarySession,
-            browser: MediaSession.ControllerInfo,
-            parentId: String
-        ): ListenableFuture<LibraryResult<Void>> {
-            return super.onUnsubscribe(session, browser, parentId)
-        }
-
         override fun onSearch(
             session: MediaLibrarySession,
             browser: MediaSession.ControllerInfo,
             query: String,
             params: LibraryParams?
         ): ListenableFuture<LibraryResult<Void>> {
-            launch(Dispatchers.IO) {
+            launch {
                 session.notifySearchResultChanged(
                     browser,
                     query,
@@ -177,7 +186,7 @@ class AudioLibraryService(
             page: Int,
             pageSize: Int,
             params: LibraryParams?
-        ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> = future(Dispatchers.IO) {
+        ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> = future {
             LibraryResult.ofItemList(playListRepo.searchSongs(query, page, pageSize), params)
         }
 
@@ -185,7 +194,7 @@ class AudioLibraryService(
             mediaSession: MediaSession,
             controller: MediaSession.ControllerInfo,
             mediaItems: MutableList<MediaItem>
-        ): ListenableFuture<MutableList<MediaItem>> = future(Dispatchers.IO) {
+        ): ListenableFuture<MutableList<MediaItem>> = future {
             mediaItems.filter {
                 playListRepo.add(mediaItems.map { item ->
                     item.mediaId.toLong()
@@ -193,11 +202,11 @@ class AudioLibraryService(
             }.toMutableList()
         }
 
-        @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+        @OptIn(UnstableApi::class)
         override fun onPlaybackResumption(
             mediaSession: MediaSession,
             controller: MediaSession.ControllerInfo
-        ): ListenableFuture<MediaItemsWithStartPosition> = future(Dispatchers.IO) {
+        ): ListenableFuture<MediaItemsWithStartPosition> = future {
             Log.i(TAG, "in onPlaybackResumption() of session callback, start to resume playback")
             // TODO: test this completely to make sure that this works
             // super.onPlaybackResumption(mediaSession, controller)

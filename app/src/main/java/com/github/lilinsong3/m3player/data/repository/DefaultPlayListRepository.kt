@@ -31,22 +31,30 @@ class DefaultPlayListRepository @Inject constructor(
         val CURRENT_POSITION = longPreferencesKey("curr_position")
     }
 
-    override suspend fun getMediaItem(mediaId: Int): MediaItem? =
+    override suspend fun getMediaItem(mediaId: Int): MediaItem? = withContext(Dispatchers.IO) {
         SongModel.toMediaItem(playListDao.querySongById(mediaId))
+    }
 
     override suspend fun getMediaItems(page: Int, pageSize: Int): List<MediaItem> =
-        playListDao.querySongs(page, pageSize).mapNotNull { SongModel.toMediaItem(it) }
+        withContext(Dispatchers.IO) {
+            playListDao.querySongs(page, pageSize).mapNotNull { SongModel.toMediaItem(it) }
+        }
 
-    override suspend fun getAllItems(): List<MediaItem> =
+    override suspend fun getAllItems(): List<MediaItem> = withContext(Dispatchers.IO) {
         playListDao.queryAll().mapNotNull { SongModel.toMediaItem(it) }
+    }
 
-    override suspend fun countMatchedSongs(keyword: String): Int =
+    override suspend fun countMatchedSongs(keyword: String): Int = withContext(Dispatchers.IO) {
         playListDao.queryMatchedNum(keyword)
+    }
 
-    override suspend fun countSongs(): Int = playListDao.queryNum()
+    override suspend fun countSongs(): Int = withContext(Dispatchers.IO) { playListDao.queryNum() }
 
     override suspend fun searchSongs(keyword: String, page: Int, pageSize: Int): List<MediaItem> =
-        playListDao.searchSongs(keyword, page, pageSize).mapNotNull { SongModel.toMediaItem(it) }
+        withContext(Dispatchers.IO) {
+            playListDao.searchSongs(keyword, page, pageSize)
+                .mapNotNull { SongModel.toMediaItem(it) }
+        }
 
     override suspend fun add(ids: List<Long>): List<Long> = withContext(Dispatchers.IO) {
         playListDao.upsertByIds(ids.map { SongIdOnly(it) })
@@ -54,28 +62,28 @@ class DefaultPlayListRepository @Inject constructor(
 
     override fun getPlayingInfoStream(): Flow<PlayingInfoModel> =
         playingInfoDataStore.data.catch { exception ->
-                // dataStore.data throws an IOException when an error is encountered when reading data
-                if (exception is IOException) {
-                    emit(emptyPreferences())
-                } else {
-                    throw exception
-                }
-            }.map { preferences ->
-                PlayingInfoModel(
-                    preferences[SONG_ID] ?: 0L,
-                    preferences[REPEAT_MODE] ?: Player.REPEAT_MODE_ALL,
-                    preferences[SHUFFLE_MODE] ?: true,
-                    preferences[CURRENT_POSITION] ?: 0L,
-                )
+            // dataStore.data throws an IOException when an error is encountered when reading data
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
             }
+        }.map { preferences ->
+            PlayingInfoModel(
+                preferences[SONG_ID] ?: 0L,
+                preferences[REPEAT_MODE] ?: Player.REPEAT_MODE_ALL,
+                preferences[SHUFFLE_MODE] ?: true,
+                preferences[CURRENT_POSITION] ?: 0L,
+            )
+        }
 
     override suspend fun savePlayingInfo(playingInfo: PlayingInfoModel) {
         playingInfoDataStore.edit { prefs ->
             playingInfo.run {
-                prefs[SONG_ID]  = songId
-                prefs[REPEAT_MODE]  = repeatMode
-                prefs[SHUFFLE_MODE]  = shuffleMode
-                prefs[CURRENT_POSITION]  = currentPosition
+                prefs[SONG_ID] = songId
+                prefs[REPEAT_MODE] = repeatMode
+                prefs[SHUFFLE_MODE] = shuffleMode
+                prefs[CURRENT_POSITION] = currentPosition
             }
         }
     }
