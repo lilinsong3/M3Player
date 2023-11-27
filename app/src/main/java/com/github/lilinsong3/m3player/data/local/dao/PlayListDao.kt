@@ -4,6 +4,7 @@ import androidx.room.*
 import com.github.lilinsong3.m3player.data.local.entity.PlayList
 import com.github.lilinsong3.m3player.data.model.SongIdOnly
 import com.github.lilinsong3.m3player.data.model.SongModel
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PlayListDao {
@@ -26,7 +27,7 @@ interface PlayListDao {
     suspend fun queryNum(): Int
 
     @Query("SELECT s.rowid id, s.* FROM Song s INNER JOIN PlayList pl ON s.rowid = pl.songId")
-    suspend fun queryAll(): List<SongModel>
+    fun observableQueryAll(): Flow<List<SongModel>>
 
     @Query("SELECT s.rowid id, s.* FROM Song s " +
             "INNER JOIN PlayList pl ON s.rowid = pl.songId " +

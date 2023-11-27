@@ -14,7 +14,7 @@ import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSession.MediaItemsWithStartPosition
-import com.github.lilinsong3.m3player.data.model.PlayingInfoModel
+import com.github.lilinsong3.m3player.data.model.PlayStateModel
 import com.github.lilinsong3.m3player.data.repository.PlayListRepository
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
@@ -23,6 +23,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.guava.future
 
+// TODO: commands/events comes into service, service rely on repository
 class AudioLibraryService(
     val playListRepo: PlayListRepository
 ) : MediaLibraryService(), CoroutineScope by MainScope() {
@@ -82,8 +83,8 @@ class AudioLibraryService(
     private fun savePlayState(player: Player) {
         player.currentMediaItem?.run {
             launch {
-                playListRepo.savePlayingInfo(
-                    PlayingInfoModel(
+                playListRepo.savePlayState(
+                    PlayStateModel(
                         mediaId.toLong(),
                         player.repeatMode,
                         player.shuffleModeEnabled,
@@ -195,6 +196,7 @@ class AudioLibraryService(
             controller: MediaSession.ControllerInfo,
             mediaItems: MutableList<MediaItem>
         ): ListenableFuture<MutableList<MediaItem>> = future {
+            // super.onAddMediaItems(mediaSession, controller, mediaItems)
             mediaItems.filter {
                 playListRepo.add(mediaItems.map { item ->
                     item.mediaId.toLong()
@@ -210,13 +212,13 @@ class AudioLibraryService(
             Log.i(TAG, "in onPlaybackResumption() of session callback, start to resume playback")
             // TODO: test this completely to make sure that this works
             // super.onPlaybackResumption(mediaSession, controller)
-            playListRepo.getPlayingInfoStream().first().run {
+            playListRepo.getPlayStateStream().first().run {
                 Log.i(TAG, "in onPlaybackResumption() of session callback, start resuming playback")
                 mediaSession.player.also {
                     it.repeatMode = repeatMode
                     it.shuffleModeEnabled = shuffleMode
                 }
-                val items = playListRepo.getAllItems()
+                val items = playListRepo.getAllItemsStream().first()
                 val startItem = items.find { item -> item.mediaId == songId.toString() }
                 MediaItemsWithStartPosition(
                     items,

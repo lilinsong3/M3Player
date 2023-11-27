@@ -1,7 +1,7 @@
 package com.github.lilinsong3.m3player.di
 
 import android.content.Context
-import com.github.lilinsong3.m3player.data.repository.playingInfoDataStore
+import com.github.lilinsong3.m3player.data.repository.playStateDataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,5 +14,5 @@ import javax.inject.Singleton
 object DataStoreModule {
     @Singleton
     @Provides
-    fun providePlayingInfoDataStore(@ApplicationContext context: Context) = context.playingInfoDataStore
+    fun providePlayStateDataStore(@ApplicationContext context: Context) = context.playStateDataStore
 }

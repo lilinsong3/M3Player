@@ -7,7 +7,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import com.github.lilinsong3.m3player.data.local.dao.PlayListDao
-import com.github.lilinsong3.m3player.data.model.PlayingInfoModel
+import com.github.lilinsong3.m3player.data.model.PlayStateModel
 import com.github.lilinsong3.m3player.data.model.SongIdOnly
 import com.github.lilinsong3.m3player.data.model.SongModel
 import kotlinx.coroutines.Dispatchers
@@ -18,10 +18,10 @@ import kotlinx.coroutines.withContext
 import java.io.IOException
 import javax.inject.Inject
 
-val Context.playingInfoDataStore: DataStore<Preferences> by preferencesDataStore(name = "PlayingInfo")
+val Context.playStateDataStore: DataStore<Preferences> by preferencesDataStore(name = "PlayState")
 
 class DefaultPlayListRepository @Inject constructor(
-    private val playingInfoDataStore: DataStore<Preferences>, private val playListDao: PlayListDao
+    private val playStateDataStore: DataStore<Preferences>, private val playListDao: PlayListDao
 ) : PlayListRepository {
 
     companion object {
@@ -40,9 +40,8 @@ class DefaultPlayListRepository @Inject constructor(
             playListDao.querySongs(page, pageSize).mapNotNull { SongModel.toMediaItem(it) }
         }
 
-    override suspend fun getAllItems(): List<MediaItem> = withContext(Dispatchers.IO) {
-        playListDao.queryAll().mapNotNull { SongModel.toMediaItem(it) }
-    }
+    override fun getAllItemsStream(): Flow<List<MediaItem>> =
+        playListDao.observableQueryAll().map { list -> list.mapNotNull(SongModel::toMediaItem) }
 
     override suspend fun countMatchedSongs(keyword: String): Int = withContext(Dispatchers.IO) {
         playListDao.queryMatchedNum(keyword)
@@ -60,8 +59,8 @@ class DefaultPlayListRepository @Inject constructor(
         playListDao.upsertByIds(ids.map { SongIdOnly(it) })
     }
 
-    override fun getPlayingInfoStream(): Flow<PlayingInfoModel> =
-        playingInfoDataStore.data.catch { exception ->
+    override fun getPlayStateStream(): Flow<PlayStateModel> =
+        playStateDataStore.data.catch { exception ->
             // dataStore.data throws an IOException when an error is encountered when reading data
             if (exception is IOException) {
                 emit(emptyPreferences())
@@ -69,7 +68,7 @@ class DefaultPlayListRepository @Inject constructor(
                 throw exception
             }
         }.map { preferences ->
-            PlayingInfoModel(
+            PlayStateModel(
                 preferences[SONG_ID] ?: 0L,
                 preferences[REPEAT_MODE] ?: Player.REPEAT_MODE_ALL,
                 preferences[SHUFFLE_MODE] ?: true,
@@ -77,9 +76,9 @@ class DefaultPlayListRepository @Inject constructor(
             )
         }
 
-    override suspend fun savePlayingInfo(playingInfo: PlayingInfoModel) {
-        playingInfoDataStore.edit { prefs ->
-            playingInfo.run {
+    override suspend fun savePlayState(playState: PlayStateModel) {
+        playStateDataStore.edit { prefs ->
+            playState.run {
                 prefs[SONG_ID] = songId
                 prefs[REPEAT_MODE] = repeatMode
                 prefs[SHUFFLE_MODE] = shuffleMode

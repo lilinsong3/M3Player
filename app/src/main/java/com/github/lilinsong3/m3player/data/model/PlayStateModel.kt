@@ -1,6 +1,6 @@
 package com.github.lilinsong3.m3player.data.model
 
-data class PlayingInfoModel(
+data class PlayStateModel(
     val songId: Long,
     val repeatMode: Int,
     val shuffleMode: Boolean,
