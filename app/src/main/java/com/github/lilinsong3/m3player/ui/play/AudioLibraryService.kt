@@ -16,16 +16,19 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSession.MediaItemsWithStartPosition
 import com.github.lilinsong3.m3player.data.model.PlayStateModel
 import com.github.lilinsong3.m3player.data.repository.PlayListRepository
+import com.github.lilinsong3.m3player.data.repository.SongRepository
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.guava.future
+import java.io.IOException
 
 // TODO: commands/events comes into service, service rely on repository
 class AudioLibraryService(
-    val playListRepo: PlayListRepository
+    val playListRepo: PlayListRepository,
+    val songRepo: SongRepository,
 ) : MediaLibraryService(), CoroutineScope by MainScope() {
     private var audioLibrarySession: MediaLibrarySession? = null
 
@@ -121,13 +124,12 @@ class AudioLibraryService(
             mediaId: String
         ): ListenableFuture<LibraryResult<MediaItem>> = future {
             try {
-                val item = playListRepo.getMediaItem(mediaId.toInt())
+                val item = songRepo.getSongByMediaId(mediaId)
                 if (item == null) LibraryResult.ofError(LibraryResult.RESULT_ERROR_BAD_VALUE)
                 else LibraryResult.ofItem(item, null)
-            } catch (e: NumberFormatException) {
-                LibraryResult.ofError(LibraryResult.RESULT_ERROR_BAD_VALUE)
+            } catch (e: IOException) {
+                LibraryResult.ofError(LibraryResult.RESULT_ERROR_IO)
             }
-
         }
 
         override fun onGetChildren(
