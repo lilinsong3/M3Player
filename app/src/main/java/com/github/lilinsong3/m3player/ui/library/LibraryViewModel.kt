@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.lilinsong3.m3player.common.Differentiable
 import com.github.lilinsong3.m3player.data.model.SongItemModel
+import com.github.lilinsong3.m3player.data.repository.MusicRepository
 import com.github.lilinsong3.m3player.data.repository.PlayListRepository
-import com.github.lilinsong3.m3player.data.repository.SongRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LibraryViewModel @Inject constructor(
-    private val songRepository: SongRepository, private val playListRepository: PlayListRepository
+    private val musicRepository: MusicRepository, private val playListRepository: PlayListRepository
 ) : ViewModel() {
 
     private val _cachedSongItems: MutableStateFlow<List<LibraryItemState>> =
@@ -23,7 +23,7 @@ class LibraryViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val libraryUiState: StateFlow<LibraryState> =
         _cachedSongItems.flatMapLatest<List<LibraryItemState>, LibraryState> { oldItems ->
-            songRepository.getLocalSongsStream(
+            musicRepository.getLocalSongsStream(
                 oldItems.size / DEFAULT_PAGE_SIZE + 1, DEFAULT_PAGE_SIZE
             ).map { newModels ->
                 LibraryState.Success(oldItems + newModels.map { model ->

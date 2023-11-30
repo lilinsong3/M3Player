@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.annotation.OptIn
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
@@ -15,8 +14,9 @@ import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSession.MediaItemsWithStartPosition
 import com.github.lilinsong3.m3player.data.model.PlayStateModel
+import com.github.lilinsong3.m3player.data.repository.DefaultMusicRepository
+import com.github.lilinsong3.m3player.data.repository.MusicRepository
 import com.github.lilinsong3.m3player.data.repository.PlayListRepository
-import com.github.lilinsong3.m3player.data.repository.SongRepository
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
@@ -28,12 +28,11 @@ import java.io.IOException
 // TODO: commands/events comes into service, service rely on repository
 class AudioLibraryService(
     val playListRepo: PlayListRepository,
-    val songRepo: SongRepository,
+    val musicRepo: MusicRepository,
 ) : MediaLibraryService(), CoroutineScope by MainScope() {
     private var audioLibrarySession: MediaLibrarySession? = null
 
     companion object {
-        const val PLAY_LIST_ROOT_ID = "PlayList"
         private const val TAG = "AudioLibraryService"
     }
 
@@ -99,23 +98,13 @@ class AudioLibraryService(
     }
 
     private inner class AudioLibrarySessionCallback : MediaLibrarySession.Callback {
-        private val playListLibraryRoot = MediaItem.Builder()
-            .setMediaId(PLAY_LIST_ROOT_ID)
-            .setMediaMetadata(
-                MediaMetadata.Builder()
-                    .setMediaType(MediaMetadata.MEDIA_TYPE_PLAYLIST)
-                    .setIsBrowsable(false)
-                    .setIsPlayable(false)
-                    .build()
-            )
-            .build()
 
         override fun onGetLibraryRoot(
             session: MediaLibrarySession,
             browser: MediaSession.ControllerInfo,
             params: LibraryParams?
         ): ListenableFuture<LibraryResult<MediaItem>> = Futures.immediateFuture(
-            LibraryResult.ofItem(playListLibraryRoot, params)
+            LibraryResult.ofItem(DefaultMusicRepository.musicDirMap[DefaultMusicRepository.ROOT] ?: MediaItem.EMPTY, params)
         )
 
         override fun onGetItem(
@@ -124,7 +113,7 @@ class AudioLibraryService(
             mediaId: String
         ): ListenableFuture<LibraryResult<MediaItem>> = future {
             try {
-                val item = songRepo.getSongByMediaId(mediaId)
+                val item = musicRepo.getMediaItemByMediaId(mediaId)
                 if (item == null) LibraryResult.ofError(LibraryResult.RESULT_ERROR_BAD_VALUE)
                 else LibraryResult.ofItem(item, null)
             } catch (e: IOException) {
@@ -140,10 +129,7 @@ class AudioLibraryService(
             pageSize: Int,
             params: LibraryParams?
         ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> =
-            if (parentId == PLAY_LIST_ROOT_ID) future {
-                LibraryResult.ofItemList(playListRepo.getMediaItems(page, pageSize), params)
-            }
-            else Futures.immediateFuture(LibraryResult.ofError(LibraryResult.RESULT_ERROR_BAD_VALUE))
+            TODO()
 
         override fun onSubscribe(
             session: MediaLibrarySession,
@@ -151,18 +137,7 @@ class AudioLibraryService(
             parentId: String,
             params: LibraryParams?
         ): ListenableFuture<LibraryResult<Void>> {
-            if (parentId == PLAY_LIST_ROOT_ID) {
-                launch {
-                    session.notifyChildrenChanged(
-                        browser,
-                        parentId,
-                        playListRepo.countSongs(),
-                        params
-                    )
-                }
-                return Futures.immediateFuture(LibraryResult.ofVoid(params))
-            }
-            return Futures.immediateFuture(LibraryResult.ofError(LibraryResult.RESULT_ERROR_BAD_VALUE))
+            TODO()
         }
 
         override fun onSearch(
