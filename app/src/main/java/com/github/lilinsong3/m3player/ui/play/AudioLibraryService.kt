@@ -113,6 +113,7 @@ class AudioLibraryService(
             mediaId: String
         ): ListenableFuture<LibraryResult<MediaItem>> = future {
             try {
+                // super.onGetItem(session, browser, mediaId)
                 val item = musicRepo.getMediaItemByMediaId(mediaId)
                 if (item == null) LibraryResult.ofError(LibraryResult.RESULT_ERROR_BAD_VALUE)
                 else LibraryResult.ofItem(item, null)

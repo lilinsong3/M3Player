@@ -8,5 +8,6 @@ interface MusicRepository {
 
     fun getLocalSongsStream(page: Int, pageSize: Int = 30) : Flow<List<SongItemModel>>
     suspend fun getMediaItemByMediaId(mediaId: String) : MediaItem?
+    suspend fun getPagingMediaChildrenByParentId(parentId: String, page: Int, pageSize: Int = 30) : List<MediaItem>
 
 }
