@@ -52,9 +52,7 @@ class AudioLibraryService(
             }
         })
         audioLibrarySession = MediaLibrarySession.Builder(
-            this,
-            exoPlayer,
-            AudioLibrarySessionCallback()
+            this, exoPlayer, AudioLibrarySessionCallback()
         ).build()
     }
 
@@ -104,13 +102,14 @@ class AudioLibraryService(
             browser: MediaSession.ControllerInfo,
             params: LibraryParams?
         ): ListenableFuture<LibraryResult<MediaItem>> = Futures.immediateFuture(
-            LibraryResult.ofItem(DefaultMusicRepository.musicDirMap[DefaultMusicRepository.ROOT] ?: MediaItem.EMPTY, params)
+            LibraryResult.ofItem(
+                DefaultMusicRepository.musicDirMap[DefaultMusicRepository.ROOT] ?: MediaItem.EMPTY,
+                params
+            )
         )
 
         override fun onGetItem(
-            session: MediaLibrarySession,
-            browser: MediaSession.ControllerInfo,
-            mediaId: String
+            session: MediaLibrarySession, browser: MediaSession.ControllerInfo, mediaId: String
         ): ListenableFuture<LibraryResult<MediaItem>> = future {
             try {
                 // super.onGetItem(session, browser, mediaId)
@@ -129,8 +128,13 @@ class AudioLibraryService(
             page: Int,
             pageSize: Int,
             params: LibraryParams?
-        ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> =
-            TODO()
+        ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> = future {
+            LibraryResult.ofItemList(
+                musicRepo.getPagingMediaChildrenByParentId(
+                    parentId, page, pageSize
+                ), params
+            )
+        }
 
         override fun onSubscribe(
             session: MediaLibrarySession,
@@ -149,10 +153,7 @@ class AudioLibraryService(
         ): ListenableFuture<LibraryResult<Void>> {
             launch {
                 session.notifySearchResultChanged(
-                    browser,
-                    query,
-                    playListRepo.countMatchedSongs(query),
-                    params
+                    browser, query, playListRepo.countMatchedSongs(query), params
                 )
             }
             return Futures.immediateFuture(LibraryResult.ofVoid(params))
@@ -184,8 +185,7 @@ class AudioLibraryService(
 
         @OptIn(UnstableApi::class)
         override fun onPlaybackResumption(
-            mediaSession: MediaSession,
-            controller: MediaSession.ControllerInfo
+            mediaSession: MediaSession, controller: MediaSession.ControllerInfo
         ): ListenableFuture<MediaItemsWithStartPosition> = future {
             Log.i(TAG, "in onPlaybackResumption() of session callback, start to resume playback")
             // TODO: test this completely to make sure that this works
