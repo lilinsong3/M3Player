@@ -142,7 +142,15 @@ class AudioLibraryService(
             parentId: String,
             params: LibraryParams?
         ): ListenableFuture<LibraryResult<Void>> {
-            TODO()
+            launch {
+                session.notifyChildrenChanged(
+                    browser,
+                    parentId,
+                    musicRepo.countChildrenByParentId(parentId),
+                    params
+                )
+            }
+            return Futures.immediateFuture(LibraryResult.ofVoid(params))
         }
 
         override fun onSearch(

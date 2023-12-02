@@ -2,16 +2,16 @@ package com.github.lilinsong3.m3player.data.repository
 
 import android.content.ContentResolver
 import android.content.ContentUris
-import android.content.Context
 import android.database.Cursor
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import androidx.annotation.RequiresApi
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import com.github.lilinsong3.m3player.data.local.dao.PlayListDao
 import com.github.lilinsong3.m3player.data.model.SongItemModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -20,14 +20,31 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
-class DefaultMusicRepository @Inject constructor(@ApplicationContext private val context: Context) :
-    MusicRepository {
+class DefaultMusicRepository @Inject constructor(
+    private val contentResolver: ContentResolver,
+    private val playListDao: PlayListDao
+) : MusicRepository {
 
     companion object {
         private val MEDIA_URI =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) MediaStore.Audio.Media.getContentUri(
                 MediaStore.VOLUME_EXTERNAL
             ) else MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+
+        private val ALBUMS_URI =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) MediaStore.Audio.Albums.getContentUri(
+                MediaStore.VOLUME_EXTERNAL
+            ) else MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
+
+        private val ARTISTS_URI =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) MediaStore.Audio.Artists.getContentUri(
+                MediaStore.VOLUME_EXTERNAL
+            ) else MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI
+
+        private val GENRES_URI =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) MediaStore.Audio.Genres.getContentUri(
+                MediaStore.VOLUME_EXTERNAL
+            ) else MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI
 
         private val BRIEF_COLUMNS_IN_MEDIA = arrayOf(
             MediaStore.Audio.Media._ID,
@@ -75,21 +92,20 @@ class DefaultMusicRepository @Inject constructor(@ApplicationContext private val
                 )
             )
 
-        private val ALBUM_COLUMNS = arrayOf(
-            MediaStore.Audio.Media.ALBUM_ID, MediaStore.Audio.Media.ALBUM
-        )
-            get() = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) field else field.plus(
-                MediaStore.Audio.Media.ALBUM_ARTIST
-            )
-
-        private val ARTIST_COLUMNS = arrayOf(
-            MediaStore.Audio.Media.ARTIST_ID, MediaStore.Audio.Media.ARTIST
+        private val ALBUMS_COLUMNS = arrayOf(
+            MediaStore.Audio.Albums._ID,
+            MediaStore.Audio.Albums.ALBUM,
+            MediaStore.Audio.Albums.ARTIST
         )
 
+        private val ARTISTS_COLUMNS = arrayOf(
+            MediaStore.Audio.Artists._ID, MediaStore.Audio.Artists.ARTIST
+        )
 
-        @RequiresApi(Build.VERSION_CODES.R)
-        private val GENRE_COLUMNS = arrayOf(
-            MediaStore.Audio.Media.GENRE_ID, MediaStore.Audio.Media.GENRE
+
+        // @RequiresApi(Build.VERSION_CODES.R)
+        private val GENRES_COLUMNS = arrayOf(
+            MediaStore.Audio.Genres._ID, MediaStore.Audio.Genres.NAME
         )
 
         const val ROOT = "root"
@@ -127,13 +143,13 @@ class DefaultMusicRepository @Inject constructor(@ApplicationContext private val
 
 
     private fun getPagingQueryCursor(page: Int, pageSize: Int): Cursor? =
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) context.contentResolver.query(
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) contentResolver.query(
             MEDIA_URI,
             BRIEF_COLUMNS_IN_MEDIA,
             null,
             null,
             "LIMIT $pageSize OFFSET ${(page - 1) * pageSize}"
-        ) else context.contentResolver.query(
+        ) else contentResolver.query(
             MEDIA_URI, BRIEF_COLUMNS_IN_MEDIA, createPagingQueryBundle(page, pageSize), null
         )
 
@@ -146,12 +162,12 @@ class DefaultMusicRepository @Inject constructor(@ApplicationContext private val
     ): Cursor? =
             /*if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)*/
         // TODO: to test whether this will work or not when there is no limit for sdk version
-        context.contentResolver.query(MEDIA_URI,
+        contentResolver.query(MEDIA_URI,
             queryCols,
             selectionColName?.let { "$it = ?" },
             selectionColArg?.let { arrayOf(it) },
             "LIMIT $pageSize OFFSET ${(page - 1) * pageSize}"
-        ) /*else context.contentResolver.query(
+        ) /*else contentResolver.query(
             MEDIA_URI, BRIEF_COLUMNS_IN_MEDIA, createPagingQueryBundle(page, pageSize), null
         )*/
 
@@ -207,29 +223,30 @@ class DefaultMusicRepository @Inject constructor(@ApplicationContext private val
 
     private fun getMusicItemsById(
         id: String, page: Int = 1, pageSize: Int = 1
-    ): List<MediaItem.Builder> = getPagingQueryCursor(
-        ENOUGH_MUSIC_COLUMNS, MediaStore.Audio.Media._ID, id, page, pageSize
-    )?.use(::buildMusicItems) ?: listOf()
+    ): List<MediaItem.Builder> = contentResolver.query(
+        MEDIA_URI,
+        ENOUGH_MUSIC_COLUMNS,
+        "${MediaStore.Audio.Media._ID} = ?",
+        arrayOf(id),
+        "LIMIT $pageSize OFFSET ${(page - 1) * pageSize}"
+    )?.use { buildMusicItems(it) } ?: listOf()
 
     private fun buildAlbumItems(cursor: Cursor): List<MediaItem.Builder> = cursor.run {
         val items = listOf<MediaItem.Builder>()
         while (moveToNext()) {
             val metadataBuilder = MediaMetadata.Builder().setIsBrowsable(false).setIsPlayable(false)
                 .setMediaType(MediaMetadata.MEDIA_TYPE_ALBUM)
-                .setAlbumTitle(getString(getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)))
+                .setAlbumTitle(getString(getColumnIndexOrThrow(MediaStore.Audio.Albums.ALBUM)))
                 .setArtworkUri(
                     ContentUris.withAppendedId(
                         MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-                        getLong(getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID))
+                        getLong(getColumnIndexOrThrow(MediaStore.Audio.Albums._ID))
                     )
-                )
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                metadataBuilder.setAlbumArtist(MediaStore.Audio.Media.ALBUM_ARTIST)
-            }
+                ).setAlbumArtist(MediaStore.Audio.Albums.ARTIST)
             items + MediaItem.Builder().setUri(
                 ContentUris.withAppendedId(
                     MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-                    getLong(getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID))
+                    getLong(getColumnIndexOrThrow(MediaStore.Audio.Albums._ID))
                 )
             ).setMediaMetadata(
                 metadataBuilder.build()
@@ -240,20 +257,24 @@ class DefaultMusicRepository @Inject constructor(@ApplicationContext private val
 
     private fun getAlbumItemsById(
         id: String, page: Int = 1, pageSize: Int = 1
-    ): List<MediaItem.Builder> = getPagingQueryCursor(
-        ALBUM_COLUMNS, MediaStore.Audio.Media.ALBUM_ID, id, page, pageSize
-    )?.use(::buildAlbumItems) ?: listOf()
+    ): List<MediaItem.Builder> = contentResolver.query(
+        ALBUMS_URI,
+        ALBUMS_COLUMNS,
+        "${MediaStore.Audio.Albums._ID} = ?",
+        arrayOf(id),
+        "LIMIT $pageSize OFFSET ${(page - 1) * pageSize}"
+    )?.use { buildAlbumItems(it) } ?: listOf()
 
     private fun buildArtistItems(cursor: Cursor): List<MediaItem.Builder> = cursor.run {
         val items = listOf<MediaItem.Builder>()
         while (moveToNext()) {
             val metadataBuilder = MediaMetadata.Builder().setIsBrowsable(false).setIsPlayable(false)
                 .setMediaType(MediaMetadata.MEDIA_TYPE_ARTIST)
-                .setArtist(getString(getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)))
+                .setArtist(getString(getColumnIndexOrThrow(MediaStore.Audio.Artists.ARTIST)))
             items + MediaItem.Builder().setUri(
                 ContentUris.withAppendedId(
                     MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI,
-                    getLong(getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST_ID))
+                    getLong(getColumnIndexOrThrow(MediaStore.Audio.Artists._ID))
                 )
             ).setMediaMetadata(
                 metadataBuilder.build()
@@ -264,22 +285,24 @@ class DefaultMusicRepository @Inject constructor(@ApplicationContext private val
 
     private fun getArtistItemsById(
         id: String, page: Int = 1, pageSize: Int = 1
-    ): List<MediaItem.Builder> = getPagingQueryCursor(
-        ARTIST_COLUMNS, MediaStore.Audio.Media.ARTIST_ID, id, page, pageSize
-    )?.use(::buildArtistItems) ?: listOf()
+    ): List<MediaItem.Builder> = contentResolver.query(
+        ARTISTS_URI,
+        ARTISTS_COLUMNS,
+        "${MediaStore.Audio.Artists._ID} = ?",
+        arrayOf(id),
+        "LIMIT $pageSize OFFSET ${(page - 1) * pageSize}"
+    )?.use { buildArtistItems(it) } ?: listOf()
 
-
-    @RequiresApi(Build.VERSION_CODES.R)
     private fun buildGenreItems(cursor: Cursor): List<MediaItem.Builder> = cursor.run {
         val items = listOf<MediaItem.Builder>()
         if (moveToNext()) {
             val metadataBuilder = MediaMetadata.Builder().setIsBrowsable(false).setIsPlayable(false)
                 .setMediaType(MediaMetadata.MEDIA_TYPE_GENRE)
-                .setArtist(getString(getColumnIndexOrThrow(MediaStore.Audio.Media.GENRE)))
+                .setArtist(getString(getColumnIndexOrThrow(MediaStore.Audio.Genres.NAME)))
             items + MediaItem.Builder().setUri(
                 ContentUris.withAppendedId(
                     MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI,
-                    getLong(getColumnIndexOrThrow(MediaStore.Audio.Media.GENRE_ID))
+                    getLong(getColumnIndexOrThrow(MediaStore.Audio.Genres._ID))
                 )
             ).setMediaMetadata(
                 metadataBuilder.build()
@@ -288,12 +311,15 @@ class DefaultMusicRepository @Inject constructor(@ApplicationContext private val
         items
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
     private fun getGenreItemsById(
         id: String, page: Int = 1, pageSize: Int = 1
-    ): List<MediaItem.Builder> = getPagingQueryCursor(
-        GENRE_COLUMNS, MediaStore.Audio.Media.GENRE_ID, id, page, pageSize
-    )?.use(::buildGenreItems) ?: listOf()
+    ): List<MediaItem.Builder> = contentResolver.query(
+        GENRES_URI,
+        GENRES_COLUMNS,
+        "${MediaStore.Audio.Genres._ID} = ?",
+        arrayOf(id),
+        "LIMIT $pageSize OFFSET ${(page - 1) * pageSize}"
+    )?.use { buildGenreItems(it) } ?: listOf()
 
     override fun getLocalSongsStream(page: Int, pageSize: Int): Flow<List<SongItemModel>> = flow {
         val songs = mutableListOf<SongItemModel>()
@@ -359,5 +385,32 @@ class DefaultMusicRepository @Inject constructor(@ApplicationContext private val
                 ) else null
             }?.map { it.setMediaId(parentId).build() } ?: listOf()
         }
+    }
+
+    private fun queryCount(tableUri: Uri): Int = contentResolver.query(
+        tableUri, arrayOf(MediaStore.MediaColumns._COUNT), null, null, null
+    )?.use {
+        if (it.moveToNext()) it.getInt(it.getColumnIndexOrThrow(MediaStore.MediaColumns._COUNT))
+        else 0
+    } ?: 0
+
+    override suspend fun countChildrenByParentId(parentId: String): Int =
+        withContext(Dispatchers.IO) {
+            when (parentId) {
+                ROOT -> musicDirMap.size - 1
+                PLAY_LIST -> playListDao.count()
+                ALBUMS -> queryCount(ALBUMS_URI)
+                ARTISTS -> queryCount(ARTISTS_URI)
+                GENRES -> queryCount(GENRES_URI)
+                else -> 0
+            }
+        }
+
+    override suspend fun countSearch(query: String): Int {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun search(query: String, page: Int, pageSize: Int): List<MediaItem> {
+        TODO("Not yet implemented")
     }
 }

@@ -22,9 +22,8 @@ interface PlayListDao {
             "OR s.artist LIKE '%' || :keyword || '%'")
     suspend fun queryMatchedNum(keyword: String): Int
 
-    @Query("SELECT count(s.rowid) FROM Song s " +
-            "INNER JOIN PlayList pl ON s.rowid = pl.songId")
-    suspend fun queryNum(): Int
+    @Query("SELECT count(songId) FROM PlayList")
+    suspend fun count(): Int
 
     @Query("SELECT s.rowid id, s.* FROM Song s INNER JOIN PlayList pl ON s.rowid = pl.songId")
     fun observableQueryAll(): Flow<List<SongModel>>

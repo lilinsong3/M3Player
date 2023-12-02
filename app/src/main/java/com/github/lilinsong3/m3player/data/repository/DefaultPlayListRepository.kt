@@ -47,7 +47,7 @@ class DefaultPlayListRepository @Inject constructor(
         playListDao.queryMatchedNum(keyword)
     }
 
-    override suspend fun countSongs(): Int = withContext(Dispatchers.IO) { playListDao.queryNum() }
+    override suspend fun countSongs(): Int = withContext(Dispatchers.IO) { playListDao.count() }
 
     override suspend fun searchSongs(keyword: String, page: Int, pageSize: Int): List<MediaItem> =
         withContext(Dispatchers.IO) {

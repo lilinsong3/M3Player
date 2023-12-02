@@ -10,4 +10,8 @@ interface MusicRepository {
     suspend fun getMediaItemByMediaId(mediaId: String) : MediaItem?
     suspend fun getPagingMediaChildrenByParentId(parentId: String, page: Int, pageSize: Int = 30) : List<MediaItem>
 
+    suspend fun countChildrenByParentId(parentId: String) : Int
+
+    suspend fun countSearch(query: String) : Int
+    suspend fun search(query: String, page: Int, pageSize: Int) : List<MediaItem>
 }
