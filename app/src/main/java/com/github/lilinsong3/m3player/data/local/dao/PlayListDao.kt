@@ -44,4 +44,7 @@ interface PlayListDao {
 
     @Query("SELECT * FROM PlayList")
     suspend fun queryAllRaw(): List<PlayList>
+
+    @Query("SELECT songId FROM PlayList LIMIT (:page - 1) * :pageSize, :pageSize")
+    suspend fun queryPagingSongIds(page: Int, pageSize: Int): List<Long>
 }

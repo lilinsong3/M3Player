@@ -12,6 +12,6 @@ interface MusicRepository {
 
     suspend fun countChildrenByParentId(parentId: String) : Int
 
-    suspend fun countSearch(query: String) : Int
-    suspend fun search(query: String, page: Int, pageSize: Int) : List<MediaItem>
+    suspend fun countSearch(queryWord: String) : Int
+    suspend fun search(queryWord: String, page: Int, pageSize: Int) : List<MediaItem>
 }

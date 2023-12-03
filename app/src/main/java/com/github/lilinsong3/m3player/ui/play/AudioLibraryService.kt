@@ -161,7 +161,7 @@ class AudioLibraryService(
         ): ListenableFuture<LibraryResult<Void>> {
             launch {
                 session.notifySearchResultChanged(
-                    browser, query, playListRepo.countMatchedSongs(query), params
+                    browser, query, musicRepo.countSearch(query), params
                 )
             }
             return Futures.immediateFuture(LibraryResult.ofVoid(params))
@@ -175,7 +175,7 @@ class AudioLibraryService(
             pageSize: Int,
             params: LibraryParams?
         ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> = future {
-            LibraryResult.ofItemList(playListRepo.searchSongs(query, page, pageSize), params)
+            LibraryResult.ofItemList(musicRepo.search(query, page, pageSize), params)
         }
 
         override fun onAddMediaItems(
@@ -183,7 +183,7 @@ class AudioLibraryService(
             controller: MediaSession.ControllerInfo,
             mediaItems: MutableList<MediaItem>
         ): ListenableFuture<MutableList<MediaItem>> = future {
-            // super.onAddMediaItems(mediaSession, controller, mediaItems)
+             super.onAddMediaItems(mediaSession, controller, mediaItems)
             mediaItems.filter {
                 playListRepo.add(mediaItems.map { item ->
                     item.mediaId.toLong()
