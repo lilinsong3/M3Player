@@ -10,7 +10,6 @@ import android.provider.MediaStore
 import androidx.annotation.RequiresApi
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
-import com.github.lilinsong3.m3player.data.local.dao.PlayListDao
 import com.github.lilinsong3.m3player.data.model.SongItemModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -22,7 +21,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 class DefaultMusicRepository @Inject constructor(
     private val contentResolver: ContentResolver,
-    private val playListDao: PlayListDao
+    private val playListRepo: PlayListRepository
 ) : MusicRepository {
 
     companion object {
@@ -371,7 +370,7 @@ class DefaultMusicRepository @Inject constructor(
             ROOT -> musicDirMap.minus(ROOT).values.toList()
             // 获取播放列表
             PLAY_LIST -> {
-                val ids = playListDao.queryPagingSongIds(page, pageSize).map { it.toString() }.toTypedArray()
+                val ids = playListRepo.getPagingSongIds(page, pageSize).map { it.toString() }.toTypedArray()
                 contentResolver.query(
                     MEDIA_URI,
                     ENOUGH_MUSIC_COLUMNS,
@@ -423,7 +422,7 @@ class DefaultMusicRepository @Inject constructor(
         withContext(Dispatchers.IO) {
             when (parentId) {
                 ROOT -> musicDirMap.size - 1
-                PLAY_LIST -> playListDao.count()
+                PLAY_LIST -> playListRepo.countSongs()
                 ALBUMS -> queryCount(ALBUMS_URI)
                 ARTISTS -> queryCount(ARTISTS_URI)
                 GENRES -> queryCount(GENRES_URI)

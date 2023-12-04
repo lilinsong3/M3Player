@@ -59,6 +59,10 @@ class DefaultPlayListRepository @Inject constructor(
         playListDao.upsertByIds(ids.map { SongIdOnly(it) })
     }
 
+    override suspend fun getPagingSongIds(page: Int, pageSize: Int): List<Long> = withContext(Dispatchers.IO) {
+        playListDao.queryPagingSongIds(page, pageSize)
+    }
+
     override fun getPlayStateStream(): Flow<PlayStateModel> =
         playStateDataStore.data.catch { exception ->
             // dataStore.data throws an IOException when an error is encountered when reading data

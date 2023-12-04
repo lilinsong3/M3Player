@@ -12,6 +12,7 @@ interface PlayListRepository {
     suspend fun countSongs(): Int
     suspend fun searchSongs(keyword: String, page: Int, pageSize: Int): List<MediaItem>
     suspend fun add(ids: List<Long>): List<Long>
+    suspend fun getPagingSongIds(page: Int, pageSize: Int): List<Long>
     fun getPlayStateStream(): Flow<PlayStateModel>
 
     suspend fun savePlayState(playingInfo: PlayStateModel)

@@ -183,12 +183,36 @@ class AudioLibraryService(
             controller: MediaSession.ControllerInfo,
             mediaItems: MutableList<MediaItem>
         ): ListenableFuture<MutableList<MediaItem>> = future {
-             super.onAddMediaItems(mediaSession, controller, mediaItems)
-            mediaItems.filter {
+            // super.onAddMediaItems(mediaSession, controller, mediaItems)
+            try {
                 playListRepo.add(mediaItems.map { item ->
-                    item.mediaId.toLong()
-                }).contains(it.mediaId.toLong())
-            }.toMutableList()
+                    item.mediaId.substringAfter("/", "-1").toLong()
+                }).map { id ->
+                    mediaItems.first { item -> item.mediaId.endsWith(id.toString()) }
+                }.toMutableList()
+            } catch (e: Exception) {
+                /* NumberFormatException, IOException, NoSuchElementException */
+                mutableListOf()
+            }
+
+        }
+
+        @OptIn(UnstableApi::class)
+        override fun onSetMediaItems(
+            mediaSession: MediaSession,
+            controller: MediaSession.ControllerInfo,
+            mediaItems: MutableList<MediaItem>,
+            startIndex: Int,
+            startPositionMs: Long
+        ): ListenableFuture<MediaItemsWithStartPosition> {
+            // TODO: override
+            return super.onSetMediaItems(
+                mediaSession,
+                controller,
+                mediaItems,
+                startIndex,
+                startPositionMs
+            )
         }
 
         @OptIn(UnstableApi::class)
