@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'com.google.dagger.hilt.android'
+    id 'com.google.devtools.ksp'
 }
 
 android {
@@ -49,7 +50,7 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
     // media3
-    def media3_version = "1.2.0"
+    def media3_version = "1.1.0"
     implementation "androidx.media3:media3-exoplayer:$media3_version"
 //    implementation "androidx.media3:media3-exoplayer-dash:$media3_version"
     implementation "androidx.media3:media3-ui:$media3_version"
@@ -57,11 +58,11 @@ dependencies {
     implementation "androidx.media3:media3-session:$media3_version"
 
     // Room
-    def room_version = "2.5.0"
+    def room_version = "2.5.2"
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
-    // To use Kotlin annotation processing tool (kapt)
-    kapt "androidx.room:room-compiler:$room_version"
+    // To use Kotlin symbol processing (ksp)
+    ksp "androidx.room:room-compiler:$room_version"
     // optional - Test helpers
     testImplementation "androidx.room:room-testing:$room_version"
     // optional - Paging 3 Integration
@@ -77,7 +78,7 @@ dependencies {
     implementation "androidx.datastore:datastore-preferences:1.0.0"
 
     // hilt
-    def hilt_version = "2.44"
+    def hilt_version = "2.48"
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
 }

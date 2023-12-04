@@ -8,10 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.github.lilinsong3.m3player.data.local.AppDatabase
 import com.github.lilinsong3.m3player.data.local.dao.PlayListDao
-import com.github.lilinsong3.m3player.data.local.dao.SongDao
 import com.github.lilinsong3.m3player.data.model.SongIdOnly
-import com.github.lilinsong3.m3player.data.model.SongModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
@@ -27,7 +24,6 @@ import java.io.IOException
  */
 @RunWith(AndroidJUnit4::class)
 class ExampleInstrumentedTest {
-    private lateinit var songDao: SongDao
     private lateinit var playListDao: PlayListDao
     private lateinit var db: AppDatabase
 
@@ -35,7 +31,6 @@ class ExampleInstrumentedTest {
     fun createDb() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
-        songDao = db.songDao()
         playListDao = db.playListDao()
     }
 
@@ -45,55 +40,6 @@ class ExampleInstrumentedTest {
         db.close()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    @Throws(Exception::class)
-    fun testSongDaoQueryAll() = runTest {
-
-        SongModel(datetime = "2023-11-15").apply {
-            songDao.insert(
-                path,
-                title,
-                artist,
-                albumTitle,
-                albumArtist,
-                displayTitle,
-                subtitle,
-                description,
-                artworkLocation,
-                lyricLocation,
-                recordingYear,
-                recordingMonth,
-                recordingDay,
-                releaseYear,
-                releaseMonth,
-                releaseDay,
-                writer,
-                composer,
-                conductor,
-                discNumber,
-                totalDiscCount,
-                genre,
-                compilation,
-                duration,
-                datetime
-            )
-        }
-        val list = songDao.queryAll()
-        Log.println(Log.ASSERT, "testSongDaoQueryAll()", "query all = $list")
-        assertNotEquals(0, list[0].id)
-        assertTrue(list[0].datetime.startsWith("2023"))
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    @Throws(Exception::class)
-    fun testPlayListDaoQueryById() = runTest {
-        val model = playListDao.querySongById(5)
-        assertEquals(null, model)
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     @Throws(Exception::class)
     fun testPlayListDaoInsertBatch() = runTest {

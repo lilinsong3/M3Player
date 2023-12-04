@@ -34,8 +34,8 @@ class LibraryFragment : Fragment() {
             viewModel.libraryUiState.collect {
                 when (it) {
                     is LibraryState.Success -> libraryListAdapter.submitList(it.items)
-                    is LibraryState.Error -> TODO()
-                    LibraryState.Loading -> TODO()
+                    is LibraryState.Error -> {}
+                    LibraryState.Loading -> {}
                 }
             }
         }

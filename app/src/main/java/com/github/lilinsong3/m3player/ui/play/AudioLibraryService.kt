@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.guava.future
 import java.io.IOException
 
-// TODO: commands/events comes into service, service rely on repository
 class AudioLibraryService(
     val playListRepo: PlayListRepository,
     val musicRepo: MusicRepository,
@@ -47,6 +46,7 @@ class AudioLibraryService(
             override fun onEvents(player: Player, events: Player.Events) {
                 super.onEvents(player, events)
                 if (events.contains(Player.EVENT_IS_PLAYING_CHANGED)) {
+                    // TODO: update PlayHistory
                     savePlayState(player)
                 }
             }
