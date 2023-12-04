@@ -59,6 +59,11 @@ class DefaultPlayListRepository @Inject constructor(
         playListDao.upsertByIds(ids.map { SongIdOnly(it) })
     }
 
+    override suspend fun set(ids: List<Long>): List<Long> = withContext(Dispatchers.IO) {
+        playListDao.clear()
+        add(ids)
+    }
+
     override suspend fun getPagingSongIds(page: Int, pageSize: Int): List<Long> = withContext(Dispatchers.IO) {
         playListDao.queryPagingSongIds(page, pageSize)
     }

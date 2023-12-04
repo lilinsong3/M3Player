@@ -42,6 +42,12 @@ interface PlayListDao {
     @Upsert(entity = PlayList::class)
     suspend fun upsertByIds(ids: List<SongIdOnly>): List<Long>
 
+    /**
+     * @return 新的id列表
+     */
+    @Query("DELETE FROM PlayList")
+    suspend fun clear()
+
     @Query("SELECT * FROM PlayList")
     suspend fun queryAllRaw(): List<PlayList>
 

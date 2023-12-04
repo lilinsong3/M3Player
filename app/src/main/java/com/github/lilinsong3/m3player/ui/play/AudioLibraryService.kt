@@ -204,15 +204,12 @@ class AudioLibraryService(
             mediaItems: MutableList<MediaItem>,
             startIndex: Int,
             startPositionMs: Long
-        ): ListenableFuture<MediaItemsWithStartPosition> {
-            // TODO: override
-            return super.onSetMediaItems(
-                mediaSession,
-                controller,
-                mediaItems,
-                startIndex,
-                startPositionMs
-            )
+        ): ListenableFuture<MediaItemsWithStartPosition> = future {
+            // TODO: handle IOE
+            playListRepo.set(mediaItems.map { item ->
+                item.mediaId.substringAfter("/", "-1").toLong()
+            })
+            MediaItemsWithStartPosition(mediaItems, startIndex, startPositionMs)
         }
 
         @OptIn(UnstableApi::class)
