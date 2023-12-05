@@ -20,17 +20,21 @@ import com.github.lilinsong3.m3player.data.repository.PlayListRepository
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.guava.future
 import java.io.IOException
+import javax.inject.Inject
 
-class AudioLibraryService(
-    val playListRepo: PlayListRepository,
-    val musicRepo: MusicRepository,
-) : MediaLibraryService(), CoroutineScope by MainScope() {
+@AndroidEntryPoint
+class AudioLibraryService() : MediaLibraryService(), CoroutineScope by MainScope() {
+
+    @Inject
+    lateinit var playListRepo: PlayListRepository
+    @Inject
+    lateinit var musicRepo: MusicRepository
     private var audioLibrarySession: MediaLibrarySession? = null
-
     companion object {
         private const val TAG = "AudioLibraryService"
     }

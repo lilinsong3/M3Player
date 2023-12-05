@@ -1,7 +1,10 @@
 package com.github.lilinsong3.m3player.ui.play
 
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class PlayViewModel : ViewModel() {
+@HiltViewModel
+class PlayViewModel @Inject constructor(): ViewModel() {
     // TODO: Implement the ViewModel
 }

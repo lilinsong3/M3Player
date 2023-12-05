@@ -12,7 +12,9 @@ import androidx.media3.session.MediaBrowser
 import androidx.media3.session.SessionToken
 import com.github.lilinsong3.m3player.databinding.TestBinding
 import com.google.common.util.concurrent.ListenableFuture
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class PlayFragment : Fragment() {
 
     private var _binding: TestBinding? = null
