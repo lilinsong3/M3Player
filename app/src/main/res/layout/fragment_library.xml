@@ -10,6 +10,22 @@
         android:id="@+id/library_recycler_songs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         tools:listitem="@layout/item_song" />
+
+    <include
+        android:id="@+id/library_loading"
+        layout="@layout/view_loading"
+        android:layout_width="@dimen/biscuit_size"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
+    <include
+        android:id="@+id/library_err"
+        layout="@layout/view_error_retry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
 
 </FrameLayout>

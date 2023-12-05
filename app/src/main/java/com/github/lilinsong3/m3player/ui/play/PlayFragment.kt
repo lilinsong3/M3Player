@@ -10,14 +10,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.media3.session.MediaBrowser
 import androidx.media3.session.SessionToken
-import com.github.lilinsong3.m3player.databinding.TestBinding
+import com.github.lilinsong3.m3player.databinding.FragmentPlayBinding
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class PlayFragment : Fragment() {
 
-    private var _binding: TestBinding? = null
+    private var _binding: FragmentPlayBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: PlayViewModel by viewModels()
@@ -27,8 +27,8 @@ class PlayFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        _binding = TestBinding.inflate(inflater, container, false)
+    ): View {
+        _binding = FragmentPlayBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -40,16 +40,13 @@ class PlayFragment : Fragment() {
             SessionToken(context, ComponentName(context, AudioLibraryService::class.java))
         ).buildAsync()
         browserFuture.addListener(
-            {
-                binding.testPlayerView.player = browserFuture.get()
-            },
+            {},
             // MoreExecutors.directExecutor()
             ContextCompat.getMainExecutor(context)
         )
     }
 
     override fun onDestroyView() {
-        binding.testPlayerView.player = null
         _binding = null
         super.onDestroyView()
     }

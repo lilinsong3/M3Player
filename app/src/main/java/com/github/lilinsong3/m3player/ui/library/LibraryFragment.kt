@@ -31,13 +31,28 @@ class LibraryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.libraryLoading.circularLoading.setVisibilityAfterHide(View.GONE)
+        // TODO: use PagingAdapter or MediaBrowser instead
         libraryListAdapter = LibraryListAdapter()
         defaultLaunch {
             viewModel.libraryUiState.collect {
                 when (it) {
-                    is LibraryState.Success -> libraryListAdapter.submitList(it.items)
-                    is LibraryState.Error -> {}
-                    LibraryState.Loading -> {}
+                    is LibraryState.Success -> {
+                        binding.libraryErr.root.visibility = View.GONE
+                        binding.libraryLoading.circularLoading.hide()
+                        binding.libraryRecyclerSongs.visibility = View.VISIBLE
+                        libraryListAdapter.submitList(it.items)
+                    }
+                    is LibraryState.Error -> {
+                        binding.libraryRecyclerSongs.visibility = View.GONE
+                        binding.libraryLoading.circularLoading.hide()
+                        binding.libraryErr.root.visibility = View.VISIBLE
+                    }
+                    LibraryState.Loading -> {
+                        binding.libraryRecyclerSongs.visibility = View.GONE
+                        binding.libraryErr.root.visibility = View.GONE
+                        binding.libraryLoading.circularLoading.show()
+                    }
                 }
             }
         }

@@ -28,7 +28,7 @@ class LibraryViewModel @Inject constructor(
             ).map { newModels ->
                 LibraryState.Success(oldItems + newModels.map { model ->
                     // TODO: add to playList and play it
-                    LibraryItemState(model) { addToPlayList(listOf(model.id)) }
+                    LibraryItemState(model) { /*addToPlayList(listOf(model.id))*/ }
                 })
             }
         }.catch { emit(LibraryState.Error("出错了")) }

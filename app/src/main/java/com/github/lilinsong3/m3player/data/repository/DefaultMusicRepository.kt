@@ -142,15 +142,15 @@ class DefaultMusicRepository @Inject constructor(
 
 
     private fun getPagingQueryCursor(page: Int, pageSize: Int): Cursor? =
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) contentResolver.query(
+        /*if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)*/ contentResolver.query(
             MEDIA_URI,
             BRIEF_COLUMNS_IN_MEDIA,
             null,
             null,
             "LIMIT $pageSize OFFSET ${(page - 1) * pageSize}"
-        ) else contentResolver.query(
+        ) /*else contentResolver.query(
             MEDIA_URI, BRIEF_COLUMNS_IN_MEDIA, createPagingQueryBundle(page, pageSize), null
-        )
+        )*/
 
     private fun getPagingQueryCursor(
         queryCols: Array<String>,

@@ -28,7 +28,7 @@ import java.io.IOException
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AudioLibraryService() : MediaLibraryService(), CoroutineScope by MainScope() {
+class AudioLibraryService : MediaLibraryService(), CoroutineScope by MainScope() {
 
     @Inject
     lateinit var playListRepo: PlayListRepository
