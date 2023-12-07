@@ -1,4 +1,4 @@
-package com.github.lilinsong3.m3player.ui.play
+package com.github.lilinsong3.m3player.ui.home.song
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

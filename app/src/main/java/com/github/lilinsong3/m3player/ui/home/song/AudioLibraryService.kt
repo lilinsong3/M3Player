@@ -1,4 +1,4 @@
-package com.github.lilinsong3.m3player.ui.play
+package com.github.lilinsong3.m3player.ui.home.song
 
 import android.content.Intent
 import android.util.Log
@@ -21,9 +21,12 @@ import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.guava.future
+import kotlinx.coroutines.launch
 import java.io.IOException
 import javax.inject.Inject
 

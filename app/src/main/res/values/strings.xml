@@ -4,7 +4,7 @@
     <string name="play_control">play control</string>
     <string name="next_song">next song</string>
     <string name="prev_song">previous song</string>
-    <string name="play_progress">playing progress of the song</string>
+    <string name="playback_progress">playback progress of the song</string>
     <string name="more">more</string>
     <string name="err_hint">An error occurs(╥_╥)</string>
     <string name="retry">retry</string>

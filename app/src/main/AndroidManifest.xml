@@ -14,7 +14,7 @@
          that other apps created. -->
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+<!--    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>-->
 
 <!--    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"-->
 <!--        android:requestLegacyExternalStorage="true"-->
@@ -39,7 +39,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".ui.play.AudioLibraryService"
+            android:name=".ui.home.song.AudioLibraryService"
             android:foregroundServiceType="mediaPlayback"
             android:exported="true"
             android:permission="android.permission.FOREGROUND_SERVICE">

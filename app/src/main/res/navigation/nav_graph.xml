@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/libraryFragment">
+    app:startDestination="@id/homeFragment">
 
     <fragment
-        android:id="@+id/playFragment"
-        android:name="com.github.lilinsong3.m3player.ui.play.PlayFragment"
-        tools:layout="@layout/fragment_play" />
+        android:id="@+id/homeFragment"
+        android:name="com.github.lilinsong3.m3player.ui.home.HomeFragment"
+        tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/libraryFragment"
         android:name="com.github.lilinsong3.m3player.ui.library.LibraryFragment"

@@ -1,4 +1,4 @@
-package com.github.lilinsong3.m3player.ui.play
+package com.github.lilinsong3.m3player.ui.home.song
 
 import androidx.media3.common.MediaItem
 import com.google.common.collect.ImmutableList

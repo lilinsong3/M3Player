@@ -14,13 +14,14 @@
         app:defaultNavHost="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:navGraph="@navigation/nav_graph"
-        tools:layout="@layout/fragment_library" />
+        tools:layout="@layout/fragment_home" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        tools:visibility="gone"
         app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior">
 
         <Button

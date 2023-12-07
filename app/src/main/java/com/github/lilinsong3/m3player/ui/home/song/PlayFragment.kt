@@ -1,4 +1,4 @@
-package com.github.lilinsong3.m3player.ui.play
+package com.github.lilinsong3.m3player.ui.home.song
 
 import android.content.ComponentName
 import android.os.Bundle
@@ -10,14 +10,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.media3.session.MediaBrowser
 import androidx.media3.session.SessionToken
-import com.github.lilinsong3.m3player.databinding.FragmentPlayBinding
+import com.github.lilinsong3.m3player.databinding.FragmentSongBinding
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class PlayFragment : Fragment() {
 
-    private var _binding: FragmentPlayBinding? = null
+    private var _binding: FragmentSongBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: PlayViewModel by viewModels()
@@ -25,10 +25,11 @@ class PlayFragment : Fragment() {
     private lateinit var browserFuture: ListenableFuture<MediaBrowser>
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentPlayBinding.inflate(inflater, container, false)
+        _binding = FragmentSongBinding.inflate(inflater, container, false)
         return binding.root
     }
 
