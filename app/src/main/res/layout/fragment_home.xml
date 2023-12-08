@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment"
-    tools:showIn="@layout/activity_main">
+    tools:showIn="@layout/activity_main"
+    tools:background="?attr/colorTertiaryContainer">
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/home_toolbar"
         android:layout_width="0dp"
@@ -19,6 +20,7 @@
             android:layout_height="wrap_content"
             android:contentDescription="@string/play_ui_tabs"
             android:layout_gravity="center"
+            android:background="@color/transparent"
             app:tabIndicator="null"
             app:tabGravity="center"
             >
@@ -53,22 +55,65 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:padding="@dimen/padding_small"
+        android:background="@color/e_3"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         >
+        <TextView
+            android:id="@+id/home_text_playback_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/moon_white"
+            app:layout_constraintBottom_toBottomOf="@id/home_slider_playback_progress"
+            app:layout_constraintEnd_toStartOf="@id/home_slider_playback_progress"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/home_slider_playback_progress"
+            tools:text="00:02:37" />
+
         <com.google.android.material.slider.Slider
-            android:id="@+id/home_slider_progress"
+            android:id="@+id/home_slider_playback_progress"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:contentDescription="@string/playback_progress"
+            app:trackColorActive="@color/moon_white"
+            app:trackColorInactive="@color/moon_shadow_white"
+            app:thumbColor="@color/moon_white"
+            app:thumbElevation="0dp"
+            app:haloColor="@color/moon_gray"
             app:labelBehavior="gone"
-            app:layout_constraintBottom_toTopOf="@+id/home_cb_play"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/home_cb_play"
+            app:layout_constraintEnd_toStartOf="@id/home_text_playback_duration"
+            app:layout_constraintStart_toEndOf="@id/home_text_playback_progress"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
             tools:value=".5" />
+
+        <TextView
+            android:id="@+id/home_text_playback_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/moon_white"
+            app:layout_constraintBottom_toBottomOf="@id/home_slider_playback_progress"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/home_slider_playback_progress"
+            app:layout_constraintTop_toTopOf="@id/home_slider_playback_progress"
+            tools:text="00:05:43" />
+
+        <Button
+            android:id="@+id/home_btn_play_mode"
+            style="?attr/materialIconButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/play_modes"
+            android:padding="0dp"
+            tools:icon="@drawable/ic_shuffle"
+            app:iconSize="@dimen/small_size"
+            app:iconTint="@color/moon_white"
+            app:layout_constraintBottom_toBottomOf="@id/home_cb_play"
+            app:layout_constraintEnd_toStartOf="@id/home_btn_prev"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/home_cb_play" />
 
         <Button
             android:id="@+id/home_btn_prev"
@@ -79,10 +124,11 @@
             android:padding="0dp"
             app:icon="@drawable/ic_prev"
             app:iconSize="@dimen/small_size"
-            app:layout_constraintBottom_toBottomOf="@+id/home_cb_play"
-            app:layout_constraintEnd_toStartOf="@+id/home_cb_play"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/home_cb_play" />
+            app:iconTint="@color/moon_white"
+            app:layout_constraintBottom_toBottomOf="@id/home_cb_play"
+            app:layout_constraintEnd_toStartOf="@id/home_cb_play"
+            app:layout_constraintStart_toEndOf="@id/home_btn_play_mode"
+            app:layout_constraintTop_toTopOf="@id/home_cb_play" />
 
         <Button
             android:id="@+id/home_btn_next"
@@ -93,10 +139,26 @@
             android:padding="0dp"
             app:icon="@drawable/ic_next"
             app:iconSize="@dimen/small_size"
-            app:layout_constraintBottom_toBottomOf="@+id/home_cb_play"
+            app:iconTint="@color/moon_white"
+            app:layout_constraintBottom_toBottomOf="@id/home_cb_play"
+            app:layout_constraintEnd_toStartOf="@id/home_btn_playlist"
+            app:layout_constraintStart_toEndOf="@id/home_cb_play"
+            app:layout_constraintTop_toTopOf="@id/home_cb_play" />
+
+        <Button
+            android:id="@+id/home_btn_playlist"
+            style="?attr/materialIconButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/playlist"
+            android:padding="0dp"
+            app:icon="@drawable/ic_playlist"
+            app:iconSize="@dimen/small_size"
+            app:iconTint="@color/moon_white"
+            app:layout_constraintBottom_toBottomOf="@id/home_cb_play"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/home_cb_play"
-            app:layout_constraintTop_toTopOf="@+id/home_cb_play" />
+            app:layout_constraintStart_toEndOf="@id/home_btn_next"
+            app:layout_constraintTop_toTopOf="@id/home_cb_play" />
 
         <CheckBox
             android:id="@+id/home_cb_play"
@@ -104,10 +166,10 @@
             android:layout_height="wrap_content"
             android:button="@drawable/sl_play_control"
             android:contentDescription="@string/play"
-            app:buttonTint="?attr/colorPrimary"
+            app:buttonTint="@color/moon_white"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/home_btn_next"
-            app:layout_constraintStart_toEndOf="@+id/home_btn_prev"
-            app:layout_constraintTop_toBottomOf="@+id/home_slider_progress" />
+            app:layout_constraintEnd_toStartOf="@id/home_btn_next"
+            app:layout_constraintStart_toEndOf="@id/home_btn_prev"
+            app:layout_constraintTop_toBottomOf="@id/home_slider_playback_progress" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

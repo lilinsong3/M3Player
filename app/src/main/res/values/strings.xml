@@ -13,6 +13,8 @@
     <string name="lists">lists</string>
     <string name="play">play</string>
     <string name="lyric">lyric</string>
+    <string name="playlist">playlist</string>
+    <string name="play_modes">switch play modes</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -7,4 +7,14 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="transparent">#00FFFFFF</color>
+    <color name="five_white">#55FFFFFF</color>
+    <color name="a_white">#11FFFFFF</color>
+    <color name="f_3">#FF333333</color>
+    <color name="e_3">#EE333333</color>
+    <color name="f_6">#FF666666</color>
+    <color name="f_9">#FF999999</color>
+    <color name="moon_shadow_white">#FFC0C4C3</color>
+    <color name="moon_white">#FFEEF7F2</color>
+    <color name="moon_gray">#FFB7AE8F</color>
 </resources>
