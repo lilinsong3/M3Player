@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:showIn="@layout/fragment_library">
+    tools:showIn="@layout/fragment_lists">
 
     <ImageView
         android:id="@+id/item_img_song"
