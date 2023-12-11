@@ -11,6 +11,8 @@
     <string name="loading">loading…</string>
     <string name="play_ui_tabs">switch pages</string>
     <string name="lists">lists</string>
+    <string name="unknown_list">unknown list</string>
+    <string name="unknown_song">unknown song</string>
     <string name="play">play</string>
     <string name="lyric">lyric</string>
     <string name="playlist">playlist</string>
