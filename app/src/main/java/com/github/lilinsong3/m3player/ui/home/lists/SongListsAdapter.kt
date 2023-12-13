@@ -1,5 +1,7 @@
 package com.github.lilinsong3.m3player.ui.home.lists
 
+import android.os.Build
+import android.util.Size
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -74,7 +76,18 @@ class SongListsAdapter : BaseExpandableListAdapter() {
         val child = lists[groupPosition].children[childPosition]
         val metadata = child.item.mediaMetadata
         val tagBinding = childView!!.tag as ItemSongBinding
-        tagBinding.itemImgSong.setImageBitmap(child.thumbnail)
+        tagBinding.itemImgSong.run {
+            val artWorkUri = child.item.mediaMetadata.artworkUri
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && artWorkUri != null) {
+                setImageBitmap(childView.context.contentResolver.loadThumbnail(
+                    artWorkUri,
+                    Size(400, 400),
+                    null
+                ))
+            } else {
+                setImageURI(artWorkUri)
+            }
+        }
         tagBinding.itemTextSong.text = metadata.title ?: metadata.displayTitle
                 ?: parent?.context?.getString(R.string.unknown_list) ?: "unknown"
         tagBinding.itemTextSinger.text =

@@ -64,8 +64,8 @@ class DefaultMusicRepository @Inject constructor(
             MediaStore.Audio.Media.ALBUM_ID, /* can be used to build artwork uri*/
             MediaStore.Audio.Media.TRACK, /*MediaStore.Audio.Media.CD_TRACK_NUMBER*/
             MediaStore.Audio.Media.YEAR,
-            MediaStore.Audio.Media.COMPOSER
-            //MediaStore.Audio.Media.DURATION,
+            MediaStore.Audio.Media.COMPOSER,
+            MediaStore.Audio.Media.DURATION
             // other fields of MediaMetaData probably needed:
             // subtitle
             // description
@@ -197,6 +197,14 @@ class DefaultMusicRepository @Inject constructor(
                 //.setReleaseDay(releaseDay)
                 //.setWriter(writer)
                 .setComposer(getString(getColumnIndexOrThrow(MediaStore.Audio.Media.COMPOSER)))
+                .setExtras(Bundle().apply {
+                    putString(
+                        MediaStore.Audio.Media.DURATION,
+                        getLong(getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION))
+                            .milliseconds
+                            .toComponents { h, m, s -> "${h}:${m}:${s}" } // 转为时分秒格式
+                    )
+                })
             //.setConductor(conductor)
             //.setTotalDiscCount(totalDiscCount)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
