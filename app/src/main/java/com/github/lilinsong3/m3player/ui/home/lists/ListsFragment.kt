@@ -30,15 +30,30 @@ class ListsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.listsLoading.circularLoading.setVisibilityAfterHide(View.GONE)
         listsAdapter = SongListsAdapter()
+        binding.listsExpLv.setAdapter(listsAdapter)
+        binding.listsExpLv.setOnGroupExpandListener(viewModel::loadMoreMusicItems)
+        
         defaultLaunch {
             viewModel.uiState.collect {
                 when (it.loadState) {
                     is LoadState.Success -> {
+                        binding.listsLoading.circularLoading.hide()
+                        binding.listsErr.root.visibility = View.GONE
+                        binding.listsExpLv.visibility = View.VISIBLE
                         listsAdapter.lists = it.lists
                     }
-                    LoadState.Loading -> {}
-                    is LoadState.Error -> {}
+                    LoadState.Loading -> {
+                        binding.listsErr.root.visibility = View.GONE
+                        binding.listsExpLv.visibility = View.GONE
+                        binding.listsLoading.circularLoading.show()
+                    }
+                    is LoadState.Error -> {
+                        binding.listsExpLv.visibility = View.GONE
+                        binding.listsLoading.circularLoading.hide()
+                        binding.listsErr.root.visibility = View.VISIBLE
+                    }
                 }
             }
         }

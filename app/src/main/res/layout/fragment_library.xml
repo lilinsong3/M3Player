@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     tools:context=".ui.library.LibraryFragment">
 
-    <!-- TODO: Update layout -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/library_recycler_songs"
         android:layout_width="match_parent"

@@ -39,15 +39,19 @@ class ListsViewModel @Inject constructor(private val browseFuture: ListenableFut
     private val _uiState = MutableStateFlow(ListsUiState())
     val uiState = _uiState
 
-    fun loadMoreMusicItems(parentId: String) {
+    fun loadMoreMusicItems(parentIndex: Int) {
         _uiState.update { it.copy(loadState = LoadState.Loading) }
-        getLoadedMusicList(parentId)?.let { loadedListUiState ->
-            val page = loadedListUiState.children.size / DEFAULT_PAGE_SIZE + 1
-            val loadedListIndex = _uiState.value.lists.indexOf(loadedListUiState)
-            viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.update { state ->
+                val loadedListUiState = state.lists[parentIndex]
+                val page = loadedListUiState.children.size / DEFAULT_PAGE_SIZE + 1
                 try {
-                    val newItemsResult =
-                        browser.getChildren(parentId, page, DEFAULT_PAGE_SIZE, null).await()
+                    val newItemsResult = browser.getChildren(
+                        loadedListUiState.list.mediaId,
+                        page,
+                        DEFAULT_PAGE_SIZE,
+                        null
+                    ).await()
                     if (newItemsResult.resultCode == LibraryResult.RESULT_SUCCESS) {
                         val updatedMusicList =
                             loadedListUiState.copy(children = loadedListUiState.children + newItemsResult.value!!.map { item ->
@@ -57,20 +61,15 @@ class ListsViewModel @Inject constructor(private val browseFuture: ListenableFut
                                         ?: ""
                                 )
                             })
-                        _uiState.update { state ->
-                            state.copy(
-                                lists = state.lists.toMutableList().also { mutableLists ->
-                                    mutableLists[loadedListIndex] = updatedMusicList
-                                }, loadState = LoadState.Success
-                            )
-                        }
+                        state.copy(
+                            lists = state.lists.toMutableList().also { mutableLists ->
+                                mutableLists[parentIndex] = updatedMusicList
+                            }, loadState = LoadState.Success
+                        )
                     } else throw Exception()
                 } catch (_: Exception) {
-                    _uiState.update { state ->
-                        state.copy(loadState = LoadState.Error())
-                    }
+                    state.copy(loadState = LoadState.Error())
                 }
-
             }
         }
     }
@@ -99,11 +98,6 @@ class ListsViewModel @Inject constructor(private val browseFuture: ListenableFut
 
         }
     }
-
-    private fun getLoadedMusicList(parentId: String): MusicListUiState? =
-        _uiState.value.lists.firstOrNull {
-            it.list.mediaId == parentId
-        }
 }
 
 data class MusicItemUiState(
@@ -114,7 +108,9 @@ data class MusicItemUiState(
 )
 
 data class MusicListUiState(
-    val list: MediaItem, val children: List<MusicItemUiState> = listOf(), val onListClick: () -> Unit = {}
+    val list: MediaItem,
+    val children: List<MusicItemUiState> = listOf(),
+    val onListClick: () -> Unit = {}
 )
 
 sealed interface LoadState {
