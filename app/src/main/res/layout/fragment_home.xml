@@ -21,7 +21,7 @@
             android:contentDescription="@string/play_ui_tabs"
             android:layout_gravity="center"
             android:background="@color/transparent"
-            app:tabIndicator="null"
+            app:tabIndicator="@null"
             app:tabGravity="center"
             >
             <com.google.android.material.tabs.TabItem

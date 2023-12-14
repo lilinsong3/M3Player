@@ -8,6 +8,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaBrowser
 import com.github.lilinsong3.m3player.R
+import com.github.lilinsong3.m3player.data.repository.DefaultMusicRepository
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -40,16 +41,16 @@ class ListsViewModel @Inject constructor(private val browseFuture: ListenableFut
 
     fun loadMoreMusicItems(parentId: String) {
         _uiState.update { it.copy(loadState = LoadState.Loading) }
-        getLoadedMusicList(parentId)?.let {
-            val page = it.children.size / DEFAULT_PAGE_SIZE + 1
-            val itIndex = _uiState.value.lists.indexOf(it)
+        getLoadedMusicList(parentId)?.let { loadedListUiState ->
+            val page = loadedListUiState.children.size / DEFAULT_PAGE_SIZE + 1
+            val loadedListIndex = _uiState.value.lists.indexOf(loadedListUiState)
             viewModelScope.launch(Dispatchers.IO) {
                 try {
                     val newItemsResult =
                         browser.getChildren(parentId, page, DEFAULT_PAGE_SIZE, null).await()
                     if (newItemsResult.resultCode == LibraryResult.RESULT_SUCCESS) {
                         val updatedMusicList =
-                            it.copy(children = it.children + newItemsResult.value!!.map { item ->
+                            loadedListUiState.copy(children = loadedListUiState.children + newItemsResult.value!!.map { item ->
                                 MusicItemUiState(
                                     item,
                                     item.mediaMetadata.extras?.getString(MediaStore.Audio.Media.DURATION)
@@ -58,12 +59,12 @@ class ListsViewModel @Inject constructor(private val browseFuture: ListenableFut
                             })
                         _uiState.update { state ->
                             state.copy(
-                                lists = state.lists.toMutableList().also { list ->
-                                    list[itIndex] = updatedMusicList
+                                lists = state.lists.toMutableList().also { mutableLists ->
+                                    mutableLists[loadedListIndex] = updatedMusicList
                                 }, loadState = LoadState.Success
                             )
                         }
-                    }
+                    } else throw Exception()
                 } catch (_: Exception) {
                     _uiState.update { state ->
                         state.copy(loadState = LoadState.Error())
@@ -71,6 +72,31 @@ class ListsViewModel @Inject constructor(private val browseFuture: ListenableFut
                 }
 
             }
+        }
+    }
+
+    fun loadMoreMusicLists() {
+        _uiState.update { it.copy(loadState = LoadState.Loading) }
+        val page = _uiState.value.lists.size / DEFAULT_PAGE_SIZE + 1
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val newListsResult =
+                    browser.getChildren(DefaultMusicRepository.ROOT, page, DEFAULT_PAGE_SIZE, null)
+                        .await()
+                if (newListsResult.resultCode == LibraryResult.RESULT_SUCCESS) {
+                    _uiState.update { state ->
+                        state.copy(
+                            lists = state.lists + newListsResult.value!!.map { MusicListUiState(it) },
+                            loadState = LoadState.Success
+                        )
+                    }
+                } else throw Exception()
+            } catch (_: Exception) {
+                _uiState.update { state ->
+                    state.copy(loadState = LoadState.Error())
+                }
+            }
+
         }
     }
 
@@ -88,7 +114,7 @@ data class MusicItemUiState(
 )
 
 data class MusicListUiState(
-    val list: MediaItem, val children: List<MusicItemUiState>, val onListClick: () -> Unit
+    val list: MediaItem, val children: List<MusicItemUiState> = listOf(), val onListClick: () -> Unit = {}
 )
 
 sealed interface LoadState {
