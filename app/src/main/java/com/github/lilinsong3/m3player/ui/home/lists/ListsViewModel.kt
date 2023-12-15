@@ -105,6 +105,21 @@ class ListsViewModel @Inject constructor(private val browseFuture: ListenableFut
             }
         }
     }
+
+    fun play(groupIndex: Int, childPosition: Int) {
+        browser.setMediaItems(uiState.value.lists[groupIndex].children.map { it.item })
+        _uiState.update {
+            it.copy(
+                lists = it.lists.toMutableList().also { parentList ->
+                    parentList[groupIndex] = parentList[groupIndex].copy(
+                        children = parentList[groupIndex].children.toMutableList().also { children ->
+                            children[childPosition] = children[childPosition].copy(isPlaying = true)
+                        }
+                    )
+                }
+            )
+        }
+    }
 }
 
 data class MusicItemUiState(

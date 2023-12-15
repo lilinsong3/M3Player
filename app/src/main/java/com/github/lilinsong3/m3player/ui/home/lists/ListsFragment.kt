@@ -17,6 +17,10 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class ListsFragment : Fragment() {
 
+    companion object {
+        private const val TAG = "RunDebug"
+    }
+
     private var _binding: FragmentListsBinding? = null
     private val binding get() = _binding!!
     private val viewModel: ListsViewModel by viewModels()
@@ -38,6 +42,12 @@ class ListsFragment : Fragment() {
         listsAdapter = SongListsAdapter()
         binding.listsExpLv.setAdapter(listsAdapter)
         binding.listsExpLv.setOnGroupExpandListener(viewModel::onGroupExpand)
+        // FIXME: 全局播放控件条件显示、列表加载出错
+        binding.listsExpLv.setOnChildClickListener { _, _, groupPosition, childPosition, id ->
+            Log.d(TAG, "OnChildClickListener: id=$id")
+            viewModel.play(groupPosition, childPosition)
+            true
+        }
         binding.listsExpLv.setOnScrollListener(object : OnScrollListener {
             override fun onScrollStateChanged(view: AbsListView?, scrollState: Int) {}
 
@@ -47,7 +57,10 @@ class ListsFragment : Fragment() {
                 visibleItemCount: Int,
                 totalItemCount: Int
             ) {
-                Log.d("RunDebug", "onScroll: firstVisibleItem=$firstVisibleItem, visibleItemCount=$visibleItemCount, totalItemCount=$totalItemCount")
+                Log.d(
+                    TAG,
+                    "onScroll: firstVisibleItem=$firstVisibleItem, visibleItemCount=$visibleItemCount, totalItemCount=$totalItemCount"
+                )
             }
 
         })
@@ -61,11 +74,13 @@ class ListsFragment : Fragment() {
                         binding.listsExpLv.visibility = View.VISIBLE
                         listsAdapter.lists = it.lists
                     }
+
                     LoadState.Loading -> {
                         binding.listsErr.root.visibility = View.GONE
                         binding.listsExpLv.visibility = View.GONE
                         binding.listsLoading.circularLoading.show()
                     }
+
                     is LoadState.Error -> {
                         binding.listsExpLv.visibility = View.GONE
                         binding.listsLoading.circularLoading.hide()
