@@ -53,8 +53,10 @@ class ListsViewModel @Inject constructor(private val browseFuture: ListenableFut
                         null
                     ).await()
                     if (newItemsResult.resultCode == LibraryResult.RESULT_SUCCESS) {
+                        val result = newItemsResult.value!!
+                        if (result.size == 0) return@update state.copy(loadState = LoadState.Success)
                         val updatedMusicList =
-                            loadedListUiState.copy(children = loadedListUiState.children + newItemsResult.value!!.map { item ->
+                            loadedListUiState.copy(children = loadedListUiState.children + result.map { item ->
                                 MusicItemUiState(
                                     item,
                                     item.mediaMetadata.extras?.getString(MediaStore.Audio.Media.DURATION)
@@ -74,28 +76,33 @@ class ListsViewModel @Inject constructor(private val browseFuture: ListenableFut
         }
     }
 
+    fun onGroupExpand(groupIndex: Int) {
+        if (_uiState.value.lists[groupIndex].children.isEmpty()) {
+            loadMoreMusicItems(groupIndex)
+        }
+    }
+
     fun loadMoreMusicLists() {
         _uiState.update { it.copy(loadState = LoadState.Loading) }
-        val page = _uiState.value.lists.size / DEFAULT_PAGE_SIZE + 1
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val newListsResult =
-                    browser.getChildren(DefaultMusicRepository.ROOT, page, DEFAULT_PAGE_SIZE, null)
-                        .await()
-                if (newListsResult.resultCode == LibraryResult.RESULT_SUCCESS) {
-                    _uiState.update { state ->
-                        state.copy(
-                            lists = state.lists + newListsResult.value!!.map { MusicListUiState(it) },
+            _uiState.update {  state ->
+                val page = state.lists.size / DEFAULT_PAGE_SIZE + 1
+                try {
+                    val newListsResult =
+                        browser.getChildren(DefaultMusicRepository.ROOT, page, DEFAULT_PAGE_SIZE, null)
+                            .await()
+                    if (newListsResult.resultCode == LibraryResult.RESULT_SUCCESS) {
+                        val result = newListsResult.value!!
+                        if (result.size == 0) state.copy(loadState = LoadState.Success)
+                        else state.copy(
+                            lists = state.lists + result.map { MusicListUiState(it) },
                             loadState = LoadState.Success
                         )
-                    }
-                } else throw Exception()
-            } catch (_: Exception) {
-                _uiState.update { state ->
+                    } else throw Exception()
+                } catch (_: Exception) {
                     state.copy(loadState = LoadState.Error())
                 }
             }
-
         }
     }
 }
