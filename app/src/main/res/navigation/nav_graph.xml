@@ -8,7 +8,12 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.github.lilinsong3.m3player.ui.home.HomeFragment"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home">
+        <argument
+            android:name="useTopAppbar"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </fragment>
     <fragment
         android:id="@+id/libraryFragment"
         android:name="com.github.lilinsong3.m3player.ui.library.LibraryFragment"

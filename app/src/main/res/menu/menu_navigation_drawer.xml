@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/homeFragment"
+        android:checkable="true"
+        android:icon="@drawable/ic_app_logo"
+        android:title="@string/app_name" />
+
+    <item
+        android:id="@+id/libraryFragment"
+        android:checkable="true"
+        android:icon="@drawable/ic_library"
+        android:title="@string/library" />
+<!--    <item-->
+<!--        android:id="@+id/mi_custom_view"-->
+<!--        android:title="@string/short_custom_view">-->
+<!--        <menu>-->
+<!--            <item-->
+<!--                android:id="@+id/gridTextFragment"-->
+<!--                android:icon="@drawable/ic_grid"-->
+<!--                android:title="@string/short_grid_text_title"-->
+<!--                android:checkable="true" />-->
+<!--        </menu>-->
+<!--    </item>-->
+<!--    <item-->
+<!--        android:id="@+id/mi_demo_practice"-->
+<!--        android:title="@string/short_custom_view">-->
+<!--        <menu>-->
+<!--            <item-->
+<!--                android:id="@+id/dazzlingBoardFragment"-->
+<!--                android:icon="@drawable/ic_android"-->
+<!--                android:title="@string/short_dazzling_board_title"-->
+<!--                android:checkable="true" />-->
+<!--        </menu>-->
+<!--    </item>-->
+</menu>

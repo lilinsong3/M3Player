@@ -1,89 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout
+    android:id="@+id/ma_drawer_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/nav_host_fragment"
-        android:name="androidx.navigation.fragment.NavHostFragment"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:defaultNavHost="true"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:navGraph="@navigation/nav_graph"
-        tools:layout="@layout/fragment_home" />
+        android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        tools:visibility="gone"
-        app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior">
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/ma_top_appbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-        <Button
-            android:id="@+id/main_btn_play_control"
-            style="?attr/materialIconButtonStyle"
-            android:layout_width="wrap_content"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/nav_host_fragment"
+            android:name="androidx.navigation.fragment.NavHostFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:defaultNavHost="true"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            app:navGraph="@navigation/nav_graph"
+            tools:layout="@layout/fragment_home" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:contentDescription="@string/play_control"
-            android:padding="0dp"
-            app:icon="@drawable/ic_play"
-            app:iconSize="@dimen/small_size"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/main_btn_next"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_gravity="bottom"
+            tools:visibility="gone"
+            app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior">
 
-        <Button
-            android:id="@+id/main_btn_next"
-            style="?attr/materialIconButtonStyle"
+            <Button
+                android:id="@+id/main_btn_play_control"
+                style="?attr/materialIconButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/play_control"
+                android:padding="0dp"
+                app:icon="@drawable/ic_play"
+                app:iconSize="@dimen/small_size"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/main_btn_next"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/main_btn_next"
+                style="?attr/materialIconButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/next_song"
+                android:padding="0dp"
+                app:icon="@drawable/ic_next"
+                app:iconSize="@dimen/small_size"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/main_img_song"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:padding="@dimen/padding_small"
+                android:contentDescription="@string/album_artwork"
+                android:minHeight="@dimen/medium_size"
+                android:src="@drawable/ic_album"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/main_text_singer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@id/main_text_song"
+                app:layout_constraintTop_toBottomOf="@id/main_text_song"
+                tools:text="歌手" />
+
+            <TextView
+                android:id="@+id/main_text_song"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?attr/textAppearanceTitleLarge"
+                app:layout_constraintBottom_toTopOf="@id/main_text_singer"
+                app:layout_constraintStart_toEndOf="@id/main_img_song"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:text="歌曲名称" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/ma_drawer_nav"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/next_song"
-            android:padding="0dp"
-            app:icon="@drawable/ic_next"
-            app:iconSize="@dimen/small_size"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:fitsSystemWindows="true"
+            app:headerLayout="@layout/header_navigation_drawer"
+            app:menu="@menu/menu_navigation_drawer" />
 
-        <ImageView
-            android:id="@+id/main_img_song"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:padding="@dimen/padding_small"
-            android:contentDescription="@string/album_artwork"
-            android:minHeight="@dimen/medium_size"
-            android:src="@drawable/ic_album"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-        <TextView
-            android:id="@+id/main_text_singer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceSubtitle1"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@id/main_text_song"
-            app:layout_constraintTop_toBottomOf="@id/main_text_song"
-            tools:text="歌手" />
-
-        <TextView
-            android:id="@+id/main_text_song"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceTitleLarge"
-            app:layout_constraintBottom_toTopOf="@id/main_text_singer"
-            app:layout_constraintStart_toEndOf="@id/main_img_song"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed"
-            tools:text="歌曲名称" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.drawerlayout.widget.DrawerLayout>
