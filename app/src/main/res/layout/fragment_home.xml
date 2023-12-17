@@ -45,16 +45,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         >
-        <TextView
-            android:id="@+id/home_text_playback_progress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/moon_white"
-            app:layout_constraintBottom_toBottomOf="@id/home_slider_playback_progress"
-            app:layout_constraintEnd_toStartOf="@id/home_slider_playback_progress"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/home_slider_playback_progress"
-            tools:text="00:02:37" />
 
         <com.google.android.material.slider.Slider
             android:id="@+id/home_slider_playback_progress"
@@ -67,23 +57,42 @@
             app:thumbElevation="0dp"
             app:haloColor="@color/moon_gray"
             app:labelBehavior="gone"
-            app:layout_constraintBottom_toTopOf="@id/home_cb_play"
-            app:layout_constraintEnd_toStartOf="@id/home_text_playback_duration"
-            app:layout_constraintStart_toEndOf="@id/home_text_playback_progress"
+            app:layout_constraintBottom_toTopOf="@id/home_barrier"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
             tools:value=".5" />
+
+        <TextView
+            android:id="@+id/home_text_playback_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/moon_white"
+            app:layout_constraintBottom_toTopOf="@id/home_barrier"
+            app:layout_constraintEnd_toStartOf="@id/home_text_playback_duration"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/home_slider_playback_progress"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            tools:text="00:02:37" />
 
         <TextView
             android:id="@+id/home_text_playback_duration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/moon_white"
-            app:layout_constraintBottom_toBottomOf="@id/home_slider_playback_progress"
+            app:layout_constraintBottom_toTopOf="@id/home_barrier"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/home_slider_playback_progress"
-            app:layout_constraintTop_toTopOf="@id/home_slider_playback_progress"
+            app:layout_constraintStart_toEndOf="@id/home_text_playback_progress"
+            app:layout_constraintTop_toBottomOf="@id/home_slider_playback_progress"
             tools:text="00:05:43" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/home_barrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="home_btn_play_mode,home_btn_prev,home_cb_play,home_btn_next,home_btn_playlist"
+            app:barrierDirection="top" />
 
         <Button
             android:id="@+id/home_btn_play_mode"
@@ -155,6 +164,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/home_btn_next"
             app:layout_constraintStart_toEndOf="@id/home_btn_prev"
-            app:layout_constraintTop_toBottomOf="@id/home_slider_playback_progress" />
+            app:layout_constraintTop_toBottomOf="@id/home_barrier" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

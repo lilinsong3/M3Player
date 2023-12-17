@@ -3,8 +3,8 @@
     <item
         android:id="@+id/homeFragment"
         android:checkable="true"
-        android:icon="@drawable/ic_app_logo"
-        android:title="@string/app_name" />
+        android:icon="@drawable/ic_play"
+        android:title="@string/play" />
 
     <item
         android:id="@+id/libraryFragment"
