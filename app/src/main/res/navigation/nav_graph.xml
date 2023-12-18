@@ -13,6 +13,10 @@
             android:name="useTopAppbar"
             app:argType="boolean"
             android:defaultValue="false" />
+        <argument
+            android:name="useTopPlaybackCtrl"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
     <fragment
         android:id="@+id/libraryFragment"

@@ -6,8 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.Navigation
-import androidx.navigation.ui.NavigationUI
+import androidx.fragment.app.activityViewModels
+import com.github.lilinsong3.m3player.Event
+import com.github.lilinsong3.m3player.MainViewModel
 import com.github.lilinsong3.m3player.R
 import com.github.lilinsong3.m3player.databinding.FragmentHomeBinding
 import com.google.android.material.tabs.TabLayoutMediator
@@ -19,6 +20,8 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var homeFragmentStateAdapter: HomeFragmentStateAdapter
+
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,7 +35,8 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // FIXME: drawer btn is not shown, here are new an appbarConfiguration
-        NavigationUI.setupWithNavController(binding.homeToolbar, Navigation.findNavController(view))
+        // NavigationUI.setupWithNavController(binding.homeToolbar, Navigation.findNavController(view))
+        binding.homeToolbar.setNavigationOnClickListener { _ -> mainViewModel.send(Event.DrawerOpenEvent(true)) }
         homeFragmentStateAdapter = HomeFragmentStateAdapter(this)
         binding.homePager2.adapter = homeFragmentStateAdapter
         TabLayoutMediator(binding.homeTabLayout, binding.homePager2) { tab, position ->
