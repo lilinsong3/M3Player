@@ -34,7 +34,6 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // FIXME: drawer btn is not shown, here are new an appbarConfiguration
         // NavigationUI.setupWithNavController(binding.homeToolbar, Navigation.findNavController(view))
         binding.homeToolbar.setNavigationOnClickListener { _ -> mainViewModel.send(Event.DrawerOpenEvent(true)) }
         homeFragmentStateAdapter = HomeFragmentStateAdapter(this)

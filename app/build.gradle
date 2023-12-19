@@ -81,6 +81,11 @@ dependencies {
     def hilt_version = "2.48"
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
+
+    // palette
+    def palette_version = "1.0.0"
+    implementation "androidx.palette:palette:$palette_version"
+    runtimeOnly "androidx.palette:palette-ktx:$palette_version"
 }
 
 // Allow references to generated code
